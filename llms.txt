@@ -1,0 +1,38 @@
+# CIcash
+
+> A budget you lend to an AI agent, not money you give it. Bounded, expiring,
+> revocable, auditable spending authority — a wire specification plus two
+> independent implementations (Python, JavaScript) held to one conformance suite.
+> Apache-2.0. Not audited; do not put real money behind it yet.
+
+The problem it solves is not moving value, which is solved. It is: how do you let
+something that decides for itself spend money, and still sleep? Budget tokens are
+macaroon-style signature chains — any holder can attenuate offline, nobody can
+remove a caveat, a settlement debits every ancestor in the lineage, and revoking
+a token kills its whole subtree instantly. A leaked token buys nothing without
+its key. Retries are free. Denials carry RETRY_AFTER / REPLAN / ESCALATE so a
+planner can act instead of looping.
+
+## For agents
+
+- [AGENTS.md](AGENTS.md): what an agent holds, and the four behaviours that change — check before planning, reuse idem_key, read `action` on denials, never invent a price or payee.
+- [dist/cicash_single.py](dist/cicash_single.py): the whole library in one file, no install, no dependencies. Running it proves eleven invariants rather than asserting them.
+- [server.json](server.json): MCP manifest. Tools are budget_check, budget_quote, budget_pay, budget_delegate, budget_receipts — and deliberately nothing that widens a budget.
+
+## Specification
+
+- [spec/SPEC.md](spec/SPEC.md): normative. Canonical encoding, the signature chain, lineage and scope, proof of possession, evaluation order, the ancestor-debit rule, receipts, error codes and their HTTP mapping.
+- [spec/vectors.json](spec/vectors.json): conformance vectors. Reproduce these in any language and you interoperate. Regenerating them is a breaking change to every implementation.
+
+## Design
+
+- [OVERVIEW.md](OVERVIEW.md): the design note — why existing rails do not fit, what Bitcoin got right and wrong and why its strengths and weaknesses are the same properties, the mechanism, the evidence, and what this is not.
+- [README.md](README.md): six invariants, each with the test that proves it.
+- [CONTRIBUTING.md](CONTRIBUTING.md): the bar for a new language implementation.
+- [SECURITY.md](SECURITY.md): what counts as a vulnerability, and the known limitations that do not.
+
+## Optional
+
+- [OVERVIEW.th.md](OVERVIEW.th.md): the design note in Thai.
+- [CHANGELOG.md](CHANGELOG.md): including the two silent cross-language bugs the second implementation found.
+- [PUBLISH.md](PUBLISH.md): release steps and the naming history.

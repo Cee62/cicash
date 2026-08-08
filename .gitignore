@@ -11,3 +11,5 @@ venv/
 wallet*.json
 .coverage
 htmlcov/
+!dist/
+!dist/cicash_single.py

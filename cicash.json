@@ -1,0 +1,76 @@
+{
+  "name": "cicash",
+  "version": "0.4.0",
+  "summary": "A budget you lend to an AI agent, not money you give it.",
+  "license": "Apache-2.0",
+  "audited": false,
+  "settles_real_value": false,
+  "unit": {
+    "name": "CIcash",
+    "micro_per_unit": 1000000,
+    "integers_only": true,
+    "carried_on_wire": false
+  },
+  "spec": {
+    "path": "spec/SPEC.md",
+    "version": "0.3",
+    "status": "draft",
+    "vectors": "spec/vectors.json"
+  },
+  "implementations": [
+    {
+      "language": "python",
+      "path": "cicash/",
+      "tests": 54,
+      "dependencies": [],
+      "optional_dependencies": [
+        "cryptography"
+      ]
+    },
+    {
+      "language": "javascript",
+      "path": "js/",
+      "tests": 24,
+      "dependencies": [],
+      "runtime": "node>=18"
+    }
+  ],
+  "interop_proof": "tools/interop_check.py",
+  "zero_install": {
+    "file": "dist/cicash_single.py",
+    "sha256": "b4472bad3df048e1e68fcb04fc46361d417d952345fb9c26794262758b22a2d0",
+    "run": "python3 cicash_single.py",
+    "effect": "self-test proving 11 invariants, exit 0 on pass"
+  },
+  "mcp": {
+    "manifest": "server.json",
+    "command": "python3 -m cicash.mcp_server",
+    "tools": [
+      "budget_check",
+      "budget_quote",
+      "budget_pay",
+      "budget_delegate",
+      "budget_receipts"
+    ],
+    "no_tool_widens_a_budget": true
+  },
+  "invariants": [
+    "delegation is attenuation-only and cannot be reversed without the root key",
+    "a settlement debits every ancestor in the lineage",
+    "revocation is subtree-wide and instant",
+    "a token without its key cannot spend",
+    "the amount and payee come from a merchant-signed quote, never from the agent",
+    "an idempotency key never charges twice, including across a restart",
+    "a parent cap does not tear under concurrency"
+  ],
+  "denial_actions": {
+    "RETRY_AFTER": "wait retry_after seconds",
+    "REPLAN": "this request cannot pass; another may",
+    "ESCALATE": "no request can pass; tell the principal"
+  },
+  "docs": {
+    "agents": "AGENTS.md",
+    "design": "OVERVIEW.md",
+    "index": "llms.txt"
+  }
+}
