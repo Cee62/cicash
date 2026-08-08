@@ -1,0 +1,127 @@
+name: release
+
+# Publishes on a version tag. Nothing here holds a long-lived credential:
+# PyPI is reached through Trusted Publishing (OIDC), where GitHub proves this
+# specific workflow's identity and PyPI mints a token that dies in minutes.
+#
+# That is the same idea the thing being published is about. A permanent bearer
+# secret pasted somewhere is exactly what CIcash exists to argue against, so it
+# would be a poor look to release it that way.
+#
+#   git tag v0.4.0 && git push origin v0.4.0
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Nothing ships unless everything the README claims is still true.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install cryptography build
+      - name: python tests
+        run: python -m unittest discover -s tests -t .
+      - name: javascript tests
+        run: node --test test/*.test.mjs
+        working-directory: js
+      - name: python mints a wallet, javascript spends it
+        run: python tools/interop_check.py
+      - name: conformance vectors are not stale
+        run: |
+          python tools/gen_vectors.py > /tmp/v.json
+          diff -u spec/vectors.json /tmp/v.json || {
+            echo "::error::spec/vectors.json is out of date. Regenerating it is a BREAKING change."
+            exit 1; }
+      - name: single-file build is reproducible and self-tests clean
+        run: |
+          python tools/build_single_file.py
+          git diff --exit-code dist/cicash_single.py || {
+            echo "::error::dist/cicash_single.py is stale. Rebuild and commit it."
+            exit 1; }
+          python dist/cicash_single.py
+      - name: the tag matches the version in the source
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          SRC=$(python -c "import cicash; print(cicash.__version__)")
+          [ "$TAG" = "$SRC" ] || {
+            echo "::error::tag $TAG does not match cicash.__version__ $SRC"; exit 1; }
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/cicash_single.py
+
+  pypi:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write        # the whole point: no PYPI_TOKEN secret exists
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - run: rm -f dist/cicash_single.py    # not a distributable package
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/cicash_single.py
+          generate_release_notes: true
+          body: |
+            Zero install, no dependencies:
+
+            ```bash
+            curl -sL https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/cicash_single.py -o cicash_single.py
+            python3 cicash_single.py
+            ```
+
+            It runs a self-test that proves eleven invariants rather than
+            asserting them, and exits non-zero if any of them fails.
+
+            Not audited. Treat this as a working reference implementation of a
+            design, not as somewhere to put real money today.
+
+  npm:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write        # used if your npm account has trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      # Prefer trusted publishing. If your npm account does not offer it yet,
+      # add an automation token as the NPM_TOKEN secret and this still works -
+      # the secret lives in GitHub, never in a chat window or a shell history.
+      - name: publish
+        working-directory: js
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
