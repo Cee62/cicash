@@ -17,16 +17,21 @@ import { Merchant } from "./protocol.js";
 import { Token, mint, verifySig, newId, canonicalRequest } from "./token.js";
 
 export const MICRO = 1_000_000;
+export const UNIT = "CIcash";
 export const ci = x => Math.round(Number(x) * MICRO);
 
+// Must render identically to the Python fmt(). `available_str` is part of the
+// balance contract an agent reads, so a divergence here is two implementations
+// disagreeing about an API field - exactly what this project says it does not
+// tolerate. tools/interop_check.py compares the two live, on every push.
 export function fmt(micro) {
   if (micro === null || micro === undefined) return "unbounded";
   const sign = micro < 0 ? "-" : "";
   const m = Math.abs(Math.trunc(micro));
   const whole = Math.floor(m / MICRO), frac = m % MICRO;
-  let s = sign + "$" + whole.toLocaleString("en-US");
+  let s = sign + whole.toLocaleString("en-US");
   if (frac) s += ("." + String(frac).padStart(6, "0")).replace(/0+$/, "");
-  return s;
+  return `${s} ${UNIT}`;
 }
 
 const digest = obj => createHash("sha256").update(canonicalBytes(obj)).digest("hex");

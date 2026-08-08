@@ -170,7 +170,7 @@ class Server:
             return self._ok(mid, {
                 "protocolVersion": params.get("protocolVersion", PROTOCOL),
                 "capabilities": {"tools": {"listChanged": False}},
-                "serverInfo": {"name": "cicash", "version": "0.4.0"},
+                "serverInfo": {"name": "cicash", "version": "0.4.1"},
                 "instructions": (
                     "You hold a bounded budget, not an account. Check it before "
                     "planning. Prices come from budget_quote, never from you. "

@@ -1,6 +1,6 @@
 {
   "name": "cicash",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "CIcash - a budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority.",
   "type": "module",
   "main": "src/index.js",
@@ -36,5 +36,10 @@
     "type": "git",
     "url": "git+https://github.com/Cee62/cicash.git",
     "directory": "js"
-  }
+  },
+  "homepage": "https://github.com/Cee62/cicash#readme",
+  "bugs": {
+    "url": "https://github.com/Cee62/cicash/issues"
+  },
+  "author": "Cee62"
 }

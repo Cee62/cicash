@@ -29,6 +29,7 @@ import { signerFromJSON } from "{BASE}/js/src/crypto.js";
 import { ser, MAX_TOTAL, NOTE } from "{BASE}/js/src/caveats.js";
 import { newId } from "{BASE}/js/src/token.js";
 import { generate } from "{BASE}/js/src/crypto.js";
+import { fmt as jsFmt } from "{BASE}/js/src/ledger.js";
 
 const io = JSON.parse(readFileSync(process.argv[2], "utf8"));
 const out = {};
@@ -52,6 +53,10 @@ out.child_wallet = { token: child.toJSON(), signer: childSigner.toJSON() };
 out.child_pop = childSigner.sign(
   canonicalRequest(childId, q.payee, io.child_amount, q.purpose, io.child_idem));
 
+// 4. render the same amounts both sides format, so a display divergence in
+// `available_str` cannot ship again
+out.fmt = io.fmt_cases.map(v => jsFmt(v));
+
 writeFileSync(process.argv[3], JSON.stringify(out));
 """
 
@@ -73,6 +78,8 @@ def main():
         "child_budget": ci(4),
         "child_amount": ci(2),
         "child_idem": "interop/child-1",
+        "fmt_cases": [0, 1, 1_000_000, 1_500_000, 47_000_000, -2_500_000,
+                      1_234_567_890, 999_999],
     }
 
     with tempfile.TemporaryDirectory() as d:
@@ -112,6 +119,13 @@ def main():
                parent_left == ci(45) and child_left == ci(2)))
 
     ok.append(("audit chain intact", led.audit_verify()))
+
+    py_fmt = [fmt(v) for v in io["fmt_cases"]]
+    ok.append(("both languages render amounts identically", js["fmt"] == py_fmt))
+    if js["fmt"] != py_fmt:
+        for a, b in zip(py_fmt, js["fmt"]):
+            if a != b:
+                print(f"        py={a!r}  js={b!r}")
 
     width = max(len(n) for n, _ in ok)
     for name, passed in ok:
