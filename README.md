@@ -1,5 +1,9 @@
 # CIcash
 
+[![ci](https://github.com/Cee62/cicash/actions/workflows/ci.yml/badge.svg)](https://github.com/Cee62/cicash/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-Apache--2.0-0C6853)](LICENSE)
+[![spec](https://img.shields.io/badge/spec-v0.3%20draft-0C6853)](spec/SPEC.md)
+
 **A budget you lend to an AI agent — not money you give it.**
 
 Bounded · expiring · revocable · auditable · worthless once stolen.

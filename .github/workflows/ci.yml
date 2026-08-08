@@ -5,6 +5,7 @@ jobs:
   python:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
@@ -22,13 +23,14 @@ jobs:
   javascript:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false          # one version failing must not hide the others
       matrix:
-        node: ["18", "20", "22"]
+        node: ["20", "22", "24"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: "${{ matrix.node }}" }
-      - run: node --test test/
+      - run: node --test test/*.test.mjs
         working-directory: js
 
   interop:
