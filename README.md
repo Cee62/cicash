@@ -22,7 +22,17 @@ python3 -m unittest discover -s tests -t .       # 56 tests
 cd js && node --test test/                       # 24 tests
 python3 tools/interop_check.py                   # python mints it, javascript spends it
 bash examples/quickstart.sh                      # a real wallet in 4 commands
+python3 examples/llm_budget.py                   # a real paid API, capped
 ```
+
+**What it's actually for today.** There is no network of merchants accepting
+CIcash, so the use case that works right now is **internal budget control** —
+wrapping an API your agent already pays for.
+[`examples/llm_budget.py`](examples/llm_budget.py) does exactly that with the
+Claude API: `count_tokens` and `max_tokens` give the worst-case cost before the
+call, `response.usage` gives the truth after it, and that gap is precisely what
+a hold is for. Reserve the ceiling, settle the actual, release the difference.
+An agent cannot overspend even on a call whose price isn't known yet.
 
 🧭 **[docs/PROJECT_STATE.md](docs/PROJECT_STATE.md)** — start here if you are picking
 this up: current state, which decisions are settled, and where the trapdoors are.
