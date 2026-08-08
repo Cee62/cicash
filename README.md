@@ -24,6 +24,8 @@ python3 tools/interop_check.py                   # python mints it, javascript s
 bash examples/quickstart.sh                      # a real wallet in 4 commands
 ```
 
+🧭 **[docs/PROJECT_STATE.md](docs/PROJECT_STATE.md)** — start here if you are picking
+this up: current state, which decisions are settled, and where the trapdoors are.
 📄 **[OVERVIEW.md](OVERVIEW.md)** — the design note: the problem, what Bitcoin got
 right and wrong, the mechanism, the evidence, and what this is not.
 🇹🇭 **[OVERVIEW.th.md](OVERVIEW.th.md)** — ฉบับภาษาไทย เข้าใจง่าย อ่านรวดเดียวจบ
