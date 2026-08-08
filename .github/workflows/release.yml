@@ -67,6 +67,7 @@ jobs:
 
   pypi:
     needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -79,6 +80,7 @@ jobs:
 
   github-release:
     needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -108,9 +110,8 @@ jobs:
 
   npm:
     needs: verify
-    # Opt-in. npm is not wired up yet, and a release that goes red on a step we
-    # knowingly cannot do is a badge nobody reads after the second time. Turn it
-    # on with:  gh variable set PUBLISH_NPM --body true
+    # Opt-in, so a release does not go red on a leg that isn't wired up yet:
+    #   gh variable set PUBLISH_NPM --body true
     if: ${{ vars.PUBLISH_NPM == 'true' }}
     runs-on: ubuntu-latest
     permissions:
@@ -120,12 +121,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          registry-url: "https://registry.npmjs.org"
-      # Prefer trusted publishing. If your npm account does not offer it yet,
-      # add an automation token as the NPM_TOKEN secret and this still works -
-      # the secret lives in GitHub, never in a chat window or a shell history.
+      # Two things the first attempt got wrong, both of which produced the same
+      # unhelpful ENEEDAUTH:
+      #
+      #   1. The npm bundled with Node 22 predates OIDC trusted publishing, so
+      #      it never even looked for the GitHub token it was standing next to.
+      #   2. `registry-url` on setup-node writes an .npmrc line reading
+      #      `_authToken=${NODE_AUTH_TOKEN}`. With no NPM_TOKEN secret that
+      #      resolves to an empty token - which is worse than no auth config at
+      #      all, because npm stops and asks you to log in instead of falling
+      #      through to OIDC. Both are now gone.
+      - name: npm new enough to speak OIDC
+        run: |
+          npm install -g npm@latest
+          npm --version
       - name: publish
         working-directory: js
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
