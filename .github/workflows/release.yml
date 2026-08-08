@@ -108,6 +108,10 @@ jobs:
 
   npm:
     needs: verify
+    # Opt-in. npm is not wired up yet, and a release that goes red on a step we
+    # knowingly cannot do is a badge nobody reads after the second time. Turn it
+    # on with:  gh variable set PUBLISH_NPM --body true
+    if: ${{ vars.PUBLISH_NPM == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write        # used if your npm account has trusted publishing
