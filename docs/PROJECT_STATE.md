@@ -25,7 +25,7 @@ Everything on the working copy is pushed. If this machine dies, nothing is lost.
 ## 2. Status in one paragraph
 
 v0.4.0 is published and installable. Two independent implementations — Python
-(`cicash/`, 54 tests) and JavaScript (`js/`, 24 tests) — are held to one
+(`cicash/`, 56 tests) and JavaScript (`js/`, 24 tests) — are held to one
 conformance suite (`spec/vectors.json`) and CI proves a wallet minted in one is
 spent by the other. There is an MCP server, an HTTP binding, an operator CLI,
 and a zero-install single-file build. **There is no settlement layer, no
@@ -166,7 +166,7 @@ If you are picking this up cold, run these four. They take under a minute and
 tell you whether anything has rotted.
 
 ```bash
-python3 -m unittest discover -s tests -t .   # 54
+python3 -m unittest discover -s tests -t .   # 56
 cd js && node --test test/*.test.mjs         # 24
 python3 tools/interop_check.py               # python mints, javascript spends
 python3 dist/cicash_single.py                # 11/11 invariants

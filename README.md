@@ -18,7 +18,7 @@ Python (stdlib only; `cryptography` optional for Ed25519) and JavaScript
 
 ```bash
 python3 demo.py                                  # the whole story in 10 scenes
-python3 -m unittest discover -s tests -t .       # 54 tests
+python3 -m unittest discover -s tests -t .       # 56 tests
 cd js && node --test test/                       # 24 tests
 python3 tools/interop_check.py                   # python mints it, javascript spends it
 bash examples/quickstart.sh                      # a real wallet in 4 commands
