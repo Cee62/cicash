@@ -1,6 +1,6 @@
 # Project state — read this first
 
-*Written 2026-08-08, at v0.4.0. This file answers "what is going on and what
+*Written 2026-08-08, at v0.4.2. This file answers "what is going on and what
 must I not break", for whoever (or whatever) picks this up next.*
 
 `README.md` says what CIcash is. `OVERVIEW.md` says why. **This file says what
@@ -16,15 +16,15 @@ are.**
 | Working copy | `/root/cicash` — a *copy*. Nothing important is only here. |
 | Source of truth | https://github.com/Cee62/cicash (`main`) |
 | Package | https://pypi.org/project/cicash/ — `pip install cicash` |
-| Release | https://github.com/Cee62/cicash/releases/tag/v0.4.0 |
+| Release | https://github.com/Cee62/cicash/releases/latest |
 | Permanent archive | Software Heritage `swh:1:snp:185c0230818abdb4d0532b330adb5ae2c7d845da` |
-| npm | **not published.** `js/package.json` claims the name `cicash`, which is free. |
+| npm | https://www.npmjs.com/package/cicash — `npm install cicash` |
 
 Everything on the working copy is pushed. If this machine dies, nothing is lost.
 
 ## 2. Status in one paragraph
 
-v0.4.0 is published and installable. Two independent implementations — Python
+v0.4.2 is published and installable. Two independent implementations — Python
 (`cicash/`, 56 tests) and JavaScript (`js/`, 24 tests) — are held to one
 conformance suite (`spec/vectors.json`) and CI proves a wallet minted in one is
 spent by the other. There is an MCP server, an HTTP binding, an operator CLI,
@@ -108,9 +108,19 @@ and is the test that will catch a regression here.
 
 ## 5. How to release — no tokens exist, and none should
 
-PyPI is reached through **Trusted Publishing (OIDC)**. There is no `PYPI_TOKEN`
-secret anywhere and there should never be one. The pending publisher is already
-configured on PyPI as `Cee62 / cicash / release.yml / environment: pypi`.
+Both registries are reached through **Trusted Publishing (OIDC)**. There is no
+`PYPI_TOKEN` and no `NPM_TOKEN` secret anywhere, and there should never be one:
+GitHub proves this specific workflow's identity and each registry mints a
+credential that expires in minutes.
+
+- PyPI: publisher `Cee62 / cicash / release.yml / environment: pypi`
+- npm: trusted publisher on the `cicash` package, gated by the repository
+  variable `PUBLISH_NPM=true`
+
+Verify a trusted-publishing release actually used OIDC rather than a token:
+`https://registry.npmjs.org/cicash` shows `dist.attestations` on versions
+published with provenance. Versions 0.4.0 and 0.4.1 were published by hand from
+a developer machine and carry none.
 
 ```bash
 # bump cicash/__init__.py, pyproject.toml, js/package.json, server.json
@@ -143,7 +153,7 @@ In rough order of what would matter most:
 4. **Dispute resolution off the payment path.** Finality for the seller,
    recourse for the principal. The trade Bitcoin never made and cards made
    backwards.
-5. **npm publish**, then a Go implementation against the same vectors.
+5. A Go implementation against the same vectors.
 
 ## 7. Two lessons worth not relearning
 

@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.4.2
+
+Documentation, and the release that proves the pipeline needs no secrets.
+
+- `docs/PROJECT_STATE.md` records how each registry is reached and which
+  credentials exist (none, once trusted publishing is configured on both).
+- CHANGELOG entry for 0.4.1, which shipped without one.
+
+The code is unchanged from 0.4.1. A release pipeline that has never run its
+npm leg is a pipeline that will fail the first time it matters, so this
+version exists to run it — the same reason every claim in this project has a
+test rather than a paragraph.
+
+## 0.4.1
+
+**The two implementations disagreed about how to render an amount.** Python
+gave `47 CIcash` where JavaScript gave `$47` — the rename to CIcash had missed
+a literal `$` in the JavaScript formatter.
+
+Display-only, but not cosmetic: `available_str` is part of the balance object
+an agent reads, so this was two implementations disagreeing about an API field.
+No existing test could see it, because the conformance vectors cover the wire
+format and rendering is not on the wire. It was found by installing the
+freshly-published npm package and running it.
+
+**Fixed**
+- `js/src/ledger.js` renders through a `UNIT` constant, matching `money.py`.
+- `tools/interop_check.py` now compares eight rendered amounts across the
+  language boundary, so a display divergence cannot ship again. CI runs it.
+- The Python canonical encoder now enforces the no-floats rule (SPEC §2.1) that
+  it wrote into the spec but only JavaScript was checking. A rule enforced by
+  one implementation catches nobody.
+
+**Added**
+- `examples/llm_budget.py` — CIcash wrapped around the Claude API. The use case
+  that works today with no settlement layer: `count_tokens` plus `max_tokens`
+  give the worst-case cost before a call, `response.usage` gives the truth
+  after it, and that gap is exactly what a hold is for.
+- `docs/PROJECT_STATE.md` — what is deliberate and must not be "fixed", and
+  where the trapdoors that fail silently are.
+
 ## 0.4.0
 
 **The unit of account has a name: the CIcash.** Until now the money in this

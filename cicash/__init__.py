@@ -28,4 +28,4 @@ __all__ = [
     "Ledger", "Principal", "Wallet", "Hold", "Receipt",
     "MemoryStore", "SqliteStore", "crypto",
 ]
-__version__ = "0.4.1"
+__version__ = "0.4.2"
