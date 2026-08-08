@@ -65,6 +65,32 @@ class TestVectors(unittest.TestCase):
             self.assertEqual(digest(r.body()), r.hash)
             prev = r.hash
 
+    def test_encoder_refuses_floats_rather_than_guessing(self):
+        """SPEC 2.1. A rule only one implementation enforces catches nobody.
+
+        This was a real gap: for one release the JavaScript encoder refused a
+        float and the Python one did not, so Python could mint
+        `expires:1800000000.5` that the JavaScript verifier then rejected with
+        no way to trace the refusal back to its cause.
+        """
+        from cicash.canonical import canonical
+        for bad in (1.5, 1800000000.0, float("1e30")):
+            with self.assertRaises(ValueError):
+                canonical({"x": bad})
+        with self.assertRaises(ValueError):
+            canonical([1, [2, 2.5]])
+        with self.assertRaises(ValueError):
+            ser("expires", 1800000000.5)
+        # integers of any size are fine
+        self.assertEqual(canonical({"x": 1800000000}), '{"x":1800000000}')
+
+    def test_encoder_emits_raw_utf8(self):
+        """SPEC 2.2. Python escapes non-ASCII by default; the spec does not."""
+        from cicash.canonical import canonical
+        self.assertEqual(canonical("\u0e07\u0e1a"), '"\u0e07\u0e1a"')
+        self.assertEqual(ser("note", "\u0e07\u0e1a\u0e27\u0e34\u0e08\u0e31\u0e22 caf\u00e9 \U0001f512"),
+                         self.v["canonical_unicode_note"])
+
     def test_tampering_a_vector_receipt_breaks_it(self):
         r = Receipt.from_dict(self.v["receipt_chain"][0])
         r.amount += 1

@@ -75,9 +75,16 @@ say so in the PR title.
 
 **No floats in anything signed or hashed** (SPEC §2.1). Python renders an
 integral float as `1800000000.0`; JavaScript renders `1800000000`. A token
-minted in one silently fails to verify in the other. `cicash/canonical.py`
-throws rather than guess — keep it that way. Timestamps are integers: `expires`
-and `quote.expires_at` in seconds, `receipt.ts` in milliseconds.
+minted in one silently fails to verify in the other. Both encoders now throw
+rather than guess — keep it that way. Timestamps are integers: `expires` and
+`quote.expires_at` in seconds, `receipt.ts` in milliseconds.
+
+> Writing this file is what caught the last instance of it: the rule was in the
+> spec, enforced in JavaScript, and *not* enforced in Python, so Python could
+> mint `expires:1800000000.5` that JavaScript then refused with no traceable
+> cause. **A spec rule that only one implementation enforces catches nobody.**
+> If you add a rule to SPEC, add it to both encoders and to
+> `tests/test_vectors.py` in the same change.
 
 **Non-ASCII is raw UTF-8, never escaped** (SPEC §2.2). Python's `json.dumps`
 escapes by default; the spec takes JavaScript's behaviour. A budget note in Thai
