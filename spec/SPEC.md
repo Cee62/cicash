@@ -1,4 +1,4 @@
-# agentcash wire specification v0.2
+# agentcash wire specification v0.3
 
 Status: **draft**. Everything below is checkable against `spec/vectors.json`.
 
@@ -15,9 +15,26 @@ times must not accumulate drift into a real overdraft.
 
 ## 2. Canonical encoding
 
-Wherever this spec says *canonical JSON*: UTF-8, object keys sorted
-lexicographically, separators `","` and `":"` with no whitespace, no trailing
+Wherever this spec says *canonical JSON*: UTF-8, object keys sorted by **Unicode
+code point**, separators `","` and `":"` with no whitespace, no trailing
 newline. All signatures and hashes are computed over canonical JSON.
+
+Two further rules are normative, and both exist because a second implementation
+found them the hard way. Each produces a **silent** failure — the token simply
+stops verifying on the other side of the wire, with nothing to point at:
+
+**2.1 No floats.** A number inside any signed or hashed structure MUST be an
+integer. Python renders an integral float as `1800000000.0`; JavaScript renders
+`1800000000`. An encoder MUST reject a non-integer rather than guess.
+Consequently: `expires` is integer unix **seconds**, `quote.expires_at` is
+integer unix **seconds**, `receipt.ts` is integer unix **milliseconds**, and all
+amounts are integer micro-units.
+
+**2.2 Raw UTF-8, not escaped.** Non-ASCII characters MUST be emitted literally.
+Python's `json.dumps` escapes them by default (`"caf\u00e9"`) and JavaScript's
+`JSON.stringify` does not (`"café"`); this spec takes the JavaScript behaviour,
+so implementations built on Python MUST pass `ensure_ascii=False`. A budget note
+in Thai or an emoji in a purpose tag verifies identically in both.
 
 ## 3. Caveats
 
@@ -34,7 +51,7 @@ A caveat is a constraint written onto a token. Serialised form:
 | `max_total` | integer µ | cumulative cap over this token **and its whole subtree** |
 | `max_per_tx` | integer µ | cap on one payment |
 | `rate` | `{"max_count","max_amount","window_s"}` | sliding-window cap; nulls allowed |
-| `expires` | number (unix s) | hard stop |
+| `expires` | integer (unix s) | hard stop |
 | `payees` | array of string | counterparty allowlist |
 | `purpose` | array of string | purpose-tag allowlist |
 | `note` | string | non-enforcing, carried into the audit trail |
@@ -99,8 +116,8 @@ seller signed:
 ```
 
 `sig = hex(HMAC-SHA256(merchant_key, canonical_json(payload)))` where *payload*
-is the object without `sig`. `expires_at` is rounded to 3 decimals before
-signing.
+is the object without `sig`. `amount` is integer micro-units and `expires_at` is
+integer unix seconds — see §2.1.
 
 Verifiers MUST reject a quote whose signature fails, whose `expires_at` has
 passed, or whose `payee` is unknown. Settlement MAY be lower than `amount` and
@@ -219,9 +236,16 @@ out of one.
 
 ## 12. Conformance
 
-`spec/vectors.json` pins caveat serialisation, both signature chains, lineage
-and scope derivation, the request string, quote signing, and the receipt chain.
-Reproduce it and you interoperate.
+`spec/vectors.json` pins caveat serialisation (including a non-ASCII case),
+both signature chains, lineage and scope derivation, the request string, quote
+signing, and the receipt chain. Reproduce it and you interoperate.
+
+Two implementations are held to it today — `agentcash/` (Python) and `js/`
+(JavaScript, node:crypto only) — and they share no code. `tools/interop_check.py`
+goes further: Python mints a wallet, JavaScript verifies it, signs a payment
+against it, and delegates a tighter child wallet offline; Python then settles
+both and checks the ancestor debit crossed the language boundary. CI runs it on
+every push.
 
 Regenerate with `python3 tools/gen_vectors.py`. Changing a vector is a
 **breaking change** to every implementation, and should be treated as one.

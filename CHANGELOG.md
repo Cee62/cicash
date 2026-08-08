@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.3.0
+
+Writing a second implementation is what this release is. It turned the format
+from "what the Python library happens to do" into something another runtime can
+be held to — and it found two real interoperability bugs on the way.
+
+**Added**
+- **A complete JavaScript implementation** (`js/`), node:crypto only, no
+  dependencies, sharing no code with the Python one. 24 tests: 11 conformance
+  against `spec/vectors.json`, 13 behavioural parity on the same invariants.
+- **Cross-language interop check** (`tools/interop_check.py`): Python mints a
+  wallet, JavaScript verifies it, signs a payment and delegates a tighter child
+  entirely offline, then Python settles both and confirms the ancestor debit
+  crossed the boundary. Runs in CI.
+- **`agentcash/canonical.py`** — one encoder for everything signed or hashed.
+- CI across Python 3.9-3.13 and Node 18/20/22, plus a guard that fails the build
+  if `spec/vectors.json` drifts from its generator.
+- `SECURITY.md`, `CONTRIBUTING.md`, `PUBLISH.md`, MCP registry manifest.
+
+**Changed — BREAKING to the wire format**
+- **No floats in signed structures** (SPEC 2.1). Python rendered an integral
+  float as `1800000000.0` where JavaScript rendered `1800000000`, so a token
+  minted in one silently failed to verify in the other. `expires` and
+  `quote.expires_at` are now integer seconds; `receipt.ts` is integer
+  milliseconds; encoders reject non-integers rather than guess.
+- **Non-ASCII is raw UTF-8, not escaped** (SPEC 2.2). Python escaped by default,
+  JavaScript did not. A budget note in Thai would have broken verification
+  across the boundary. Vectors now include a non-ASCII case.
+- Object keys sort by Unicode code point, stated explicitly.
+- `spec/vectors.json` regenerated. Every signature value in it changed.
+
+**Tests**: 54 Python + 24 JavaScript + 1 interop check.
+
 ## 0.2.0
 
 Everything v0.1 disclaimed in its "what this is not, yet" section, except L0.

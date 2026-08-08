@@ -178,7 +178,7 @@ class Ledger:
 
             r = Receipt(
                 receipt_id=new_id("rcpt"),
-                ts=self._clock(),
+                ts=int(self._clock() * 1000),
                 root_id=h.root_id,
                 lineage=h.lineage,
                 payee=h.payee,
@@ -371,7 +371,7 @@ class Principal:
         if rate is not None:
             caveats.append(ser(cv.RATE, _norm_rate(rate)))
         if ttl_s is not None:
-            caveats.append(ser(cv.EXPIRES, round(self.ledger._clock() + ttl_s, 3)))
+            caveats.append(ser(cv.EXPIRES, int(self.ledger._clock() + ttl_s)))
         if payees is not None:
             caveats.append(ser(cv.PAYEES, sorted(payees)))
         if purposes is not None:
@@ -472,7 +472,7 @@ class Wallet:
             (cv.MAX_TOTAL, None if budget is None else int(budget)),
             (cv.MAX_PER_TX, None if per_tx is None else int(per_tx)),
             (cv.RATE, None if rate is None else _norm_rate(rate)),
-            (cv.EXPIRES, None if ttl_s is None else round(self.ledger._clock() + ttl_s, 3)),
+            (cv.EXPIRES, None if ttl_s is None else int(self.ledger._clock() + ttl_s)),
             (cv.PAYEES, None if payees is None else sorted(payees)),
             (cv.PURPOSE, None if purposes is None else sorted(purposes)),
         ):

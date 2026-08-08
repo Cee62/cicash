@@ -1,14 +1,13 @@
 """Records that outlive a process."""
 
 import hashlib
-import json
 from dataclasses import dataclass, asdict, field
+
+from .canonical import canonical_bytes
 
 
 def digest(obj) -> str:
-    return hashlib.sha256(
-        json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    return hashlib.sha256(canonical_bytes(obj)).hexdigest()
 
 
 @dataclass
@@ -39,7 +38,7 @@ class Hold:
 @dataclass
 class Receipt:
     receipt_id: str
-    ts: float
+    ts: int          # unix MILLIseconds, integer - never a float in a hash
     root_id: str
     lineage: tuple
     payee: str

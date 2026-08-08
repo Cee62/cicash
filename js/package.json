@@ -1,0 +1,40 @@
+{
+  "name": "agentcash-protocol",
+  "version": "0.3.0",
+  "description": "A budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "payments",
+    "budget",
+    "capability",
+    "macaroon",
+    "mcp",
+    "authorization",
+    "http-402",
+    "delegation",
+    "ed25519"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OWNER/agentcash.git",
+    "directory": "js"
+  }
+}

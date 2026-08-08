@@ -4,11 +4,15 @@
 
 Bounded · expiring · revocable · auditable · worthless once stolen.
 
-Pure Python 3, zero required dependencies. `cryptography` optional, for Ed25519.
+**Two independent implementations, held to one published conformance suite.**
+Python (stdlib only; `cryptography` optional for Ed25519) and JavaScript
+(`node:crypto` only, zero dependencies). They share no code.
 
 ```bash
 python3 demo.py                                  # the whole story in 10 scenes
 python3 -m unittest discover -s tests -t .       # 54 tests
+cd js && node --test test/                       # 24 tests
+python3 tools/interop_check.py                   # python mints it, javascript spends it
 bash examples/quickstart.sh                      # a real wallet in 4 commands
 ```
 
@@ -161,11 +165,30 @@ agentcash --db ac.db audit
 
 ## Interoperability
 
-The Python package is not the standard — [`spec/SPEC.md`](spec/SPEC.md) is, and
+Neither package is the standard — [`spec/SPEC.md`](spec/SPEC.md) is, and
 [`spec/vectors.json`](spec/vectors.json) pins caveat serialisation, both signature
 chains, lineage derivation, the request string, quote signing, and the receipt chain.
-Reproduce the vectors in any language and you interoperate. `tests/test_vectors.py`
-holds this implementation to them.
+Reproduce the vectors in any language and you interoperate.
+
+`tools/interop_check.py` proves the stronger claim: **Python mints a wallet,
+JavaScript verifies it, signs a payment against it, and delegates a tighter child
+wallet entirely offline — then Python settles both and confirms the ancestor debit
+crossed the language boundary.** CI runs it on every push, alongside a guard that
+fails the build if the vectors drift from their generator.
+
+Writing the second implementation is also what hardened the format. It found two
+bugs that fail *silently* — a token that simply stops verifying on the other side
+of the wire, with nothing to point at:
+
+- Python renders an integral float as `1800000000.0`; JavaScript renders
+  `1800000000`. **No float may appear in a signed structure**, and encoders now
+  reject one rather than guess (SPEC §2.1).
+- Python escapes non-ASCII by default, JavaScript does not. A budget note in Thai
+  would have broken cross-language verification. **Raw UTF-8 is normative**
+  (SPEC §2.2), and the vectors carry a non-ASCII case.
+
+That is the argument for a second implementation in general: the first one cannot
+tell you which of its choices were decisions and which were defaults.
 
 ---
 
@@ -190,8 +213,20 @@ Stated plainly, because a payment library that oversells itself is worse than no
 2. Blinded receipts
 3. Dispute layer off the payment path — finality for the seller, recourse for the
    principal, which is the trade Bitcoin never made and cards made backwards
-4. Reference implementations in TypeScript and Go against the same vectors
+4. A Go implementation against the same vectors — the JavaScript one took an
+   afternoon and paid for itself twice over
 
 ---
 
-Apache-2.0. See [CHANGELOG.md](CHANGELOG.md) for what changed in 0.2.
+## Publishing
+
+See [PUBLISH.md](PUBLISH.md). One thing to know before you pick names: **`agentcash`
+is already taken on npm** by an active package in this same space (v0.17.1, tagged
+`mcp · x402 · payments · ai`). The JavaScript package here is therefore
+`agentcash-protocol`. That collision is worth a deliberate decision rather than a
+default — the reasoning is in PUBLISH.md.
+
+---
+
+Apache-2.0. See [CHANGELOG.md](CHANGELOG.md) for what changed in 0.3, including two
+breaking wire-format fixes.

@@ -15,16 +15,15 @@ injected instruction to overpay has nowhere to write the number down.
 
 import hmac
 import hashlib
-import json
 import time
 from dataclasses import dataclass
 
+from .canonical import canonical_bytes
 from .token import new_id
 
 
 def _sign(key: bytes, payload: dict) -> str:
-    blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hmac.new(key, blob.encode(), hashlib.sha256).hexdigest()
+    return hmac.new(key, canonical_bytes(payload), hashlib.sha256).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -33,7 +32,7 @@ class Quote:
     payee: str
     amount: int          # micro-units, the ceiling. settle may be lower, never higher
     purpose: str
-    expires_at: float
+    expires_at: int      # unix SECONDS, integer
     sig: str
 
     def to_dict(self):
@@ -44,7 +43,7 @@ class Quote:
     @staticmethod
     def from_dict(d):
         return Quote(d["quote_id"], d["payee"], int(d["amount"]), d["purpose"],
-                     float(d["expires_at"]), d["sig"])
+                     int(d["expires_at"]), d["sig"])
 
     def payload(self):
         return {
@@ -52,7 +51,7 @@ class Quote:
             "payee": self.payee,
             "amount": self.amount,
             "purpose": self.purpose,
-            "expires_at": round(self.expires_at, 3),
+            "expires_at": int(self.expires_at),
         }
 
 
@@ -70,7 +69,7 @@ class Merchant:
             "payee": self.payee_id,
             "amount": int(amount),
             "purpose": purpose,
-            "expires_at": round(self._clock() + ttl_s, 3),
+            "expires_at": int(self._clock() + ttl_s),
         }
         return Quote(sig=_sign(self._key, p), **p)
 

@@ -1,0 +1,50 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "${{ matrix.python }}" }
+      - name: no-dependency path (hmac fallback)
+        run: python -m unittest discover -s tests -t . -v
+      - name: with ed25519
+        run: |
+          pip install cryptography
+          python -m unittest discover -s tests -t . -v
+          python -c "from agentcash import Ledger; p=Ledger().security_profile(); assert p['ed25519_available'], p"
+
+  javascript:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ matrix.node }}" }
+      - run: node --test test/
+        working-directory: js
+
+  interop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: pip install cryptography
+      - name: python issues, javascript spends
+        run: python tools/interop_check.py
+      - name: vectors are not stale
+        run: |
+          python tools/gen_vectors.py > /tmp/v.json
+          diff -u spec/vectors.json /tmp/v.json || {
+            echo "::error::spec/vectors.json is out of date. Regenerating it is a BREAKING change."
+            exit 1; }

@@ -3,11 +3,12 @@
     "max_total:50000000",
     "max_per_tx:5000000",
     "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
-    "expires:1800000000.0",
+    "expires:1800000000",
     "payees:[\"api.gpu\",\"api.search\"]",
     "purpose:[\"research\"]"
   ],
   "canonical_request": "tok_child|api.search|2000000|research|run/1",
+  "canonical_unicode_note": "note:\"\u0e07\u0e1a\u0e27\u0e34\u0e08\u0e31\u0e22 caf\u00e9 \ud83d\udd12\"",
   "child_lineage": [
     "tok_root",
     "tok_child"
@@ -43,7 +44,7 @@
     [
       "tok_root",
       "expires",
-      1800000000.0
+      1800000000
     ],
     [
       "tok_root",
@@ -74,7 +75,7 @@
       5000000
     ]
   ],
-  "digest_of_r1_body": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+  "digest_of_r1_body": "6b8cb1bb85476a680ed463797683ad00830c17f28946132d78ad276f790caadd",
   "inputs": {
     "binding_child": {
       "alg": "ed25519",
@@ -89,16 +90,16 @@
   },
   "quote_payload": {
     "amount": 2000000,
-    "expires_at": 1700000060.0,
+    "expires_at": 1700000060,
     "payee": "api.search",
     "purpose": "research",
     "quote_id": "q_demo"
   },
-  "quote_sig_hmac_sha256": "d4c60e6b08dee34d4d02e5588332a40814125465b03359f98bdd7cc236d9906c",
+  "quote_sig_hmac_sha256": "807c2620bbc0706200e8f25282b1244885926a2919b87e9b548719850eeb7502",
   "receipt_chain": [
     {
       "amount": 2000000,
-      "hash": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+      "hash": "6b8cb1bb85476a680ed463797683ad00830c17f28946132d78ad276f790caadd",
       "idem_key": "run/1",
       "lineage": [
         "tok_root"
@@ -109,23 +110,23 @@
       "quote_id": "q_demo",
       "receipt_id": "rcpt_1",
       "root_id": "acme",
-      "ts": 1700000001.0
+      "ts": 1700000001000
     },
     {
       "amount": 1500000,
-      "hash": "b9961b5733f0a3a440345c4d2837623539dbd24e19e3475706bd89c8f7c1f347",
+      "hash": "c333938794f5a9491504563ce2d882cd8773f08064fb1b42e7cff9d39d9af85b",
       "idem_key": "run/2",
       "lineage": [
         "tok_root",
         "tok_child"
       ],
       "payee": "api.gpu",
-      "prev_hash": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+      "prev_hash": "6b8cb1bb85476a680ed463797683ad00830c17f28946132d78ad276f790caadd",
       "purpose": "research",
       "quote_id": "q_two",
       "receipt_id": "rcpt_2",
       "root_id": "acme",
-      "ts": 1700000002.0
+      "ts": 1700000002000
     }
   ],
   "token_child": {
@@ -134,7 +135,7 @@
       "max_total:50000000",
       "max_per_tx:5000000",
       "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
-      "expires:1800000000.0",
+      "expires:1800000000",
       "payees:[\"api.gpu\",\"api.search\"]",
       "purpose:[\"research\"]",
       "sub:\"tok_child\"",
@@ -143,7 +144,7 @@
     ],
     "root_id": "acme",
     "root_token_id": "tok_root",
-    "sig": "69233f188628ebb243649fe6e91d9b33aa1060dfc3f9241f095cc6335f554e36"
+    "sig": "973d7fdb9fa8b483b128d50b70d71d1ef84c57eb011c06ca440c55baf9333957"
   },
   "token_root": {
     "caveats": [
@@ -151,13 +152,13 @@
       "max_total:50000000",
       "max_per_tx:5000000",
       "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
-      "expires:1800000000.0",
+      "expires:1800000000",
       "payees:[\"api.gpu\",\"api.search\"]",
       "purpose:[\"research\"]"
     ],
     "root_id": "acme",
     "root_token_id": "tok_root",
-    "sig": "f809c8090de46e5a5ce3d4bd727d4df7d0acab4e504f3896d2e42cbb38bd934a"
+    "sig": "a2598d469151886090b9b51509bab6a1a948ca60479a4abfb9fc6fafd9bd9f97"
   },
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

@@ -10,7 +10,7 @@ nothing, because both are evaluated and the tighter one wins. There is no
 syntax in this system that can loosen a constraint. Not "should not". Cannot.
 """
 
-import json
+from .canonical import canonical
 
 # --- caveat kinds -----------------------------------------------------------
 SUB = "sub"                # marks a delegation boundary; value = new token id
@@ -28,10 +28,11 @@ STATELESS = (MAX_PER_TX, EXPIRES, PAYEES, PURPOSE)
 
 
 def ser(kind: str, value) -> str:
-    return kind + ":" + json.dumps(value, sort_keys=True, separators=(",", ":"))
+    return kind + ":" + canonical(value)
 
 
 def de(caveat: str):
+    import json
     kind, _, raw = caveat.partition(":")
     return kind, json.loads(raw)
 

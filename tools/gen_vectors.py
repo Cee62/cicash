@@ -32,7 +32,7 @@ def main():
         ser(MAX_TOTAL, 50_000_000),
         ser(MAX_PER_TX, 5_000_000),
         ser(RATE, {"max_amount": 20_000_000, "max_count": 4, "window_s": 60}),
-        ser(EXPIRES, 1800000000.0),
+        ser(EXPIRES, 1800000000),
         ser(PAYEES, ["api.gpu", "api.search"]),
         ser(PURPOSE, ["research"]),
     ]
@@ -44,16 +44,18 @@ def main():
     assert child.lineage == ("tok_root", "tok_child")
 
     quote = {"quote_id": "q_demo", "payee": "api.search", "amount": 2_000_000,
-             "purpose": "research", "expires_at": 1700000060.0}
+             "purpose": "research", "expires_at": 1700000060}
+    unicode_note = ser("note", "งบวิจัย café 🔒")   # cross-language UTF-8 check
 
-    r1 = Receipt("rcpt_1", 1700000001.0, "acme", ("tok_root",), "api.search",
+    r1 = Receipt("rcpt_1", 1700000001000, "acme", ("tok_root",), "api.search",
                  2_000_000, "research", "q_demo", "run/1", "genesis").seal()
-    r2 = Receipt("rcpt_2", 1700000002.0, "acme", ("tok_root", "tok_child"),
+    r2 = Receipt("rcpt_2", 1700000002000, "acme", ("tok_root", "tok_child"),
                  "api.gpu", 1_500_000, "research", "q_two", "run/2", r1.hash).seal()
 
     out = {
-        "version": "0.2.0",
+        "version": "0.3.0",
         "canonical_caveats": caveats,
+        "canonical_unicode_note": unicode_note,
         "token_root": root.to_dict(),
         "token_child": child.to_dict(),
         "child_lineage": list(child.lineage),
