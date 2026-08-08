@@ -14,7 +14,7 @@ Report a vulnerability). Please do not open a public issue for anything that
 lets a token spend more than its grant allows.
 
 Include: what you can spend that you should not be able to, the smallest
-reproduction you have, and which implementation (`agentcash/` or `js/`).
+reproduction you have, and which implementation (`cicash/` or `js/`).
 
 ## What counts as a vulnerability
 

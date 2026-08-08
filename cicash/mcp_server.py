@@ -11,14 +11,14 @@ Every denial comes back as structured content with an `action` field
 instead of a wall to bang on.
 
 Run:
-    AGENTCASH_WALLET=./wallet.json AGENTCASH_DB=./ac.db \\
-        python3 -m agentcash.mcp_server
+    CICASH_WALLET=./wallet.json CICASH_DB=./ac.db \\
+        python3 -m cicash.mcp_server
 
 Claude Code / Claude Desktop config:
-    {"mcpServers": {"agentcash": {
-        "command": "python3", "args": ["-m", "agentcash.mcp_server"],
-        "env": {"AGENTCASH_WALLET": "/abs/wallet.json",
-                "AGENTCASH_DB": "/abs/ac.db"}}}}
+    {"mcpServers": {"cicash": {
+        "command": "python3", "args": ["-m", "cicash.mcp_server"],
+        "env": {"CICASH_WALLET": "/abs/wallet.json",
+                "CICASH_DB": "/abs/ac.db"}}}}
 """
 
 import json
@@ -52,10 +52,10 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "payee": {"type": "string", "description": "seller id, e.g. api.search"},
-                "amount_usd": {"type": "number"},
+                "amount": {"type": "number"},
                 "purpose": {"type": "string", "description": "must be inside your grant"},
             },
-            "required": ["payee", "amount_usd", "purpose"],
+            "required": ["payee", "amount", "purpose"],
             "additionalProperties": False,
         },
     },
@@ -88,12 +88,12 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "budget_usd": {"type": "number"},
-                "per_tx_usd": {"type": "number"},
+                "budget": {"type": "number"},
+                "per_tx": {"type": "number"},
                 "purposes": {"type": "array", "items": {"type": "string"}},
                 "note": {"type": "string", "description": "what this sub-agent is for"},
             },
-            "required": ["budget_usd", "note"],
+            "required": ["budget", "note"],
             "additionalProperties": False,
         },
     },
@@ -129,8 +129,8 @@ class Server:
         m = self.merchants.get(a["payee"])
         if m is None:
             return {"error": "unknown payee", "known": sorted(self.merchants)}
-        from .money import usd
-        return m.quote(usd(a["amount_usd"]), a["purpose"]).to_dict()
+        from .money import ci
+        return m.quote(ci(a["amount"]), a["purpose"]).to_dict()
 
     def budget_pay(self, a):
         r = self.w.pay(Quote.from_dict(a["quote"]), idem_key=a["idem_key"])
@@ -139,10 +139,10 @@ class Server:
                 "remaining": self.w.balance()["available_str"]}
 
     def budget_delegate(self, a):
-        from .money import usd
+        from .money import ci
         sub = self.w.delegate(
-            budget=usd(a["budget_usd"]),
-            per_tx=None if a.get("per_tx_usd") is None else usd(a["per_tx_usd"]),
+            budget=ci(a["budget"]),
+            per_tx=None if a.get("per_tx") is None else ci(a["per_tx"]),
             purposes=a.get("purposes"), note=a["note"])
         return {"wallet": sub.to_dict(),
                 "warning": "this blob is a credential; hand it to the sub-agent "
@@ -170,7 +170,7 @@ class Server:
             return self._ok(mid, {
                 "protocolVersion": params.get("protocolVersion", PROTOCOL),
                 "capabilities": {"tools": {"listChanged": False}},
-                "serverInfo": {"name": "agentcash", "version": "0.2.0"},
+                "serverInfo": {"name": "cicash", "version": "0.4.0"},
                 "instructions": (
                     "You hold a bounded budget, not an account. Check it before "
                     "planning. Prices come from budget_quote, never from you. "
@@ -199,15 +199,15 @@ class Server:
 
 
 def build_from_env():
-    db = os.environ.get("AGENTCASH_DB")
+    db = os.environ.get("CICASH_DB")
     led = Ledger.sqlite(db) if db else Ledger()
-    path = os.environ.get("AGENTCASH_WALLET")
+    path = os.environ.get("CICASH_WALLET")
     if not path:
-        raise SystemExit("set AGENTCASH_WALLET=/path/to/wallet.json "
-                         "(create one with `python3 -m agentcash.cli grant`)")
+        raise SystemExit("set CICASH_WALLET=/path/to/wallet.json "
+                         "(create one with `python3 -m cicash.cli grant`)")
     with open(path) as f:
         w = Wallet.from_dict(led, json.load(f))
-    payees = os.environ.get("AGENTCASH_MERCHANTS", "api.search,api.gpu")
+    payees = os.environ.get("CICASH_MERCHANTS", "api.search,api.gpu")
     merchants = {p: led.register_merchant(p) for p in payees.split(",") if p}
     return Server(w, merchants)
 

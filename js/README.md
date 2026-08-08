@@ -1,25 +1,25 @@
-# agentcash-protocol
+# CIcash
 
-JavaScript implementation of [agentcash](../README.md) — a budget you lend to an
+JavaScript implementation of [CIcash](../README.md) — a budget you lend to an
 AI agent, not money you give it.
 
 `node:crypto` only. No dependencies. Node >= 18.
 
 ```js
-import { Ledger, usd, Denied } from "agentcash-protocol";
+import { Ledger, ci, Denied } from "CIcash";
 
 const led   = new Ledger();
 const acme  = led.registerPrincipal("acme");
 const api   = led.registerMerchant("api.search");
 
 const agent = acme.grant({
-  budget: usd(50), perTx: usd(5),
+  budget: ci(50), perTx: ci(5),
   rate: { max_count: 20, window_s: 60 },
   payees: ["api.search"], purposes: ["research"],
 });
 
-agent.pay(api.quote(usd(2), "research"), "run1/step3");
-const sub = agent.delegate({ budget: usd(5) });   // offline, tighter only
+agent.pay(api.quote(ci(2), "research"), "run1/step3");
+const sub = agent.delegate({ budget: ci(5) });   // offline, tighter only
 acme.revoke(agent);                               // kills sub too
 led.auditVerify();
 ```

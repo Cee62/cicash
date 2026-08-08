@@ -1,4 +1,4 @@
-# agentcash wire specification v0.3
+# CIcash wire specification v0.3
 
 Status: **draft**. Everything below is checkable against `spec/vectors.json`.
 
@@ -7,11 +7,21 @@ An implementation in any language that reproduces the vectors interoperates.
 
 ---
 
-## 1. Units
+## 1. Unit of account
 
-Amounts are **integers of micro-units** (µ), 1 µ = 10⁻⁶ of the settlement unit.
-Floats MUST NOT appear in any amount field. An agent that retries ten thousand
-times must not accumulate drift into a real overdraft.
+The unit is the **CIcash**. Amounts are **integers of micro-units**,
+1 CIcash = 1,000,000 micro-units. Floats MUST NOT appear in any amount field:
+an agent that retries ten thousand times must not accumulate drift into a real
+overdraft, and a float does not survive the language boundary (§2.1).
+
+The unit's *name* is not carried anywhere in the wire format — amounts are bare
+integers — so a deployment may denominate in something else without changing a
+single byte or invalidating a vector. What the name fixes is the meaning of the
+integer, which every party to a payment must already agree on.
+
+The CIcash is deliberately not an investment asset. If the unit appreciates,
+agents hoard it and the payment layer dies. That is Gresham's law, and it is how
+Bitcoin stopped being cash and became a thing people keep instead.
 
 ## 2. Canonical encoding
 
@@ -240,7 +250,7 @@ out of one.
 both signature chains, lineage and scope derivation, the request string, quote
 signing, and the receipt chain. Reproduce it and you interoperate.
 
-Two implementations are held to it today — `agentcash/` (Python) and `js/`
+Two implementations are held to it today — `cicash/` (Python) and `js/`
 (JavaScript, node:crypto only) — and they share no code. `tools/interop_check.py`
 goes further: Python mints a wallet, JavaScript verifies it, signs a payment
 against it, and delegates a tighter child wallet offline; Python then settles

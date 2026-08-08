@@ -7,7 +7,7 @@ import tempfile
 import threading
 import unittest
 
-from agentcash import Ledger, SqliteStore, Wallet, usd, Denied, crypto
+from cicash import Ledger, SqliteStore, Wallet, ci, Denied, crypto
 
 
 class TestDurability(unittest.TestCase):
@@ -25,19 +25,19 @@ class TestDurability(unittest.TestCase):
         led = self._open()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search", key=b"fixed-merchant-key")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"])
-        w.pay(api.quote(usd(12), "research"), idem_key="k1")
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"])
+        w.pay(api.quote(ci(12), "research"), idem_key="k1")
         blob = w.to_dict()
-        self.assertEqual(w.balance()["available"], usd(38))
+        self.assertEqual(w.balance()["available"], ci(38))
 
         del led                                   # process dies here
         led2 = self._open()                       # ...and comes back
         api2 = led2.register_merchant("api.search", key=b"fixed-merchant-key")
         w2 = Wallet.from_dict(led2, blob)
-        self.assertEqual(w2.balance()["available"], usd(38))
+        self.assertEqual(w2.balance()["available"], ci(38))
 
-        w2.pay(api2.quote(usd(8), "research"), idem_key="k2")
-        self.assertEqual(w2.balance()["available"], usd(30))
+        w2.pay(api2.quote(ci(8), "research"), idem_key="k2")
+        self.assertEqual(w2.balance()["available"], ci(30))
         self.assertTrue(led2.audit_verify())
         self.assertEqual(len(led2.receipts), 2)
 
@@ -46,8 +46,8 @@ class TestDurability(unittest.TestCase):
         led = self._open()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search", key=b"k")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"])
-        q = api.quote(usd(5), "research", ttl_s=10_000)
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"])
+        q = api.quote(ci(5), "research", ttl_s=10_000)
         r1 = w.pay(q, idem_key="run/step-1")
         blob = w.to_dict()
 
@@ -58,15 +58,15 @@ class TestDurability(unittest.TestCase):
         r2 = w2.pay(q, idem_key="run/step-1")
         self.assertEqual(r1.receipt_id, r2.receipt_id)
         self.assertEqual(len(led2.receipts), 1)
-        self.assertEqual(w2.balance()["available"], usd(45))
+        self.assertEqual(w2.balance()["available"], ci(45))
 
     def test_receipt_chain_persists_and_still_detects_tampering(self):
         led = self._open()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search", key=b"k")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"])
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"])
         for i in range(3):
-            w.pay(api.quote(usd(1), "research"), idem_key=f"k{i}")
+            w.pay(api.quote(ci(1), "research"), idem_key=f"k{i}")
         self.assertTrue(self._open().audit_verify())
 
         import sqlite3
@@ -90,13 +90,13 @@ class TestOfflineDelegation(unittest.TestCase):
         led = Ledger()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"])
-        sub = w.delegate(budget=usd(5))
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"])
+        sub = w.delegate(budget=ci(5))
 
         self.assertIsNone(led.store.get_binding_secret(sub.token.token_id))
-        sub.pay(api.quote(usd(2), "research"), idem_key="s1")
-        self.assertEqual(sub.balance()["available"], usd(3))
-        self.assertEqual(w.balance()["available"], usd(48))
+        sub.pay(api.quote(ci(2), "research"), idem_key="s1")
+        self.assertEqual(sub.balance()["available"], ci(3))
+        self.assertEqual(w.balance()["available"], ci(48))
 
     @unittest.skipUnless(crypto.HAVE_ED25519, "ed25519 backend unavailable")
     def test_ledger_stores_no_private_material(self):
@@ -108,20 +108,20 @@ class TestOfflineDelegation(unittest.TestCase):
         led = Ledger()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"],
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"],
                        signer=crypto.HmacSigner())
-        w.pay(api.quote(usd(1), "research"), idem_key="h1")
-        self.assertEqual(w.balance()["available"], usd(49))
+        w.pay(api.quote(ci(1), "research"), idem_key="h1")
+        self.assertEqual(w.balance()["available"], ci(49))
 
     @unittest.skipUnless(crypto.HAVE_ED25519, "ed25519 backend unavailable")
     def test_wrong_key_cannot_spend_a_valid_token(self):
         led = Ledger()
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search")
-        w = acme.grant(budget=usd(50), payees=["api.search"], purposes=["research"])
+        w = acme.grant(budget=ci(50), payees=["api.search"], purposes=["research"])
         imposter = Wallet(led, w.token, crypto.generate())
         with self.assertRaises(Denied) as e:
-            imposter.pay(api.quote(usd(1), "research"), idem_key="i1")
+            imposter.pay(api.quote(ci(1), "research"), idem_key="i1")
         self.assertEqual(e.exception.reason, "POP_INVALID")
 
 
@@ -144,9 +144,9 @@ class TestConcurrentDebit(unittest.TestCase):
         led = Ledger.sqlite(path)
         acme = led.register_principal("acme")
         api = led.register_merchant("api.search", key=b"k")
-        parent = acme.grant(budget=usd(100), payees=["api.search"],
+        parent = acme.grant(budget=ci(100), payees=["api.search"],
                             purposes=["research"])
-        kids = [parent.delegate(budget=usd(100)) for _ in range(16)]
+        kids = [parent.delegate(budget=ci(100)) for _ in range(16)]
 
         ok, denied = [], []
         lock = threading.Lock()
@@ -156,7 +156,7 @@ class TestConcurrentDebit(unittest.TestCase):
             m = w.ledger.register_merchant("api.search", key=b"k")
             for j in range(10):
                 try:
-                    r = w.pay(m.quote(usd(1), "research", ttl_s=600),
+                    r = w.pay(m.quote(ci(1), "research", ttl_s=600),
                               idem_key=f"t{i}/{j}")
                     with lock:
                         ok.append(r.amount)
@@ -172,7 +172,7 @@ class TestConcurrentDebit(unittest.TestCase):
             t.join()
 
         total = sum(ok)
-        self.assertEqual(total, usd(100), "parent cap leaked under concurrency")
+        self.assertEqual(total, ci(100), "parent cap leaked under concurrency")
         self.assertEqual(len(ok) + len(denied), 160)
         self.assertEqual(Ledger.sqlite(path).balance(parent.token)["available"], 0)
         self.assertTrue(Ledger.sqlite(path).audit_verify())

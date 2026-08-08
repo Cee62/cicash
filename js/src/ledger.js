@@ -17,7 +17,7 @@ import { Merchant } from "./protocol.js";
 import { Token, mint, verifySig, newId, canonicalRequest } from "./token.js";
 
 export const MICRO = 1_000_000;
-export const usd = x => Math.round(Number(x) * MICRO);
+export const ci = x => Math.round(Number(x) * MICRO);
 
 export function fmt(micro) {
   if (micro === null || micro === undefined) return "unbounded";

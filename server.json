@@ -1,19 +1,38 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.github.OWNER/agentcash",
-  "description": "Give an agent a bounded, revocable, auditable budget. It gets tools to check its balance, get signed quotes, pay, and sub-delegate - and no tool that can widen a budget.",
-  "version": "0.3.0",
-  "repository": { "url": "https://github.com/OWNER/agentcash", "source": "github" },
+  "name": "io.github.OWNER/cicash",
+  "description": "Give an agent a bounded, revocable, auditable CIcash budget. It gets tools to check its balance, get signed quotes, pay, and sub-delegate - and no tool that can widen a budget.",
+  "version": "0.4.0",
+  "repository": {
+    "url": "https://github.com/OWNER/cicash",
+    "source": "github"
+  },
   "packages": [
     {
       "registryType": "pypi",
-      "identifier": "agentcash",
-      "version": "0.3.0",
-      "transport": { "type": "stdio" },
+      "identifier": "cicash",
+      "version": "0.4.0",
+      "transport": {
+        "type": "stdio"
+      },
       "environmentVariables": [
-        { "name": "AGENTCASH_WALLET", "description": "Path to the wallet blob issued by `agentcash grant`. This file is a credential.", "isRequired": true, "isSecret": true },
-        { "name": "AGENTCASH_DB", "description": "SQLite ledger path. Omit for an in-memory ledger.", "isRequired": false },
-        { "name": "AGENTCASH_MERCHANTS", "description": "Comma-separated payee ids to register.", "isRequired": false, "default": "api.search,api.gpu" }
+        {
+          "name": "CICASH_WALLET",
+          "description": "Path to the wallet blob issued by `cicash grant`. This file is a credential.",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "CICASH_DB",
+          "description": "SQLite ledger path. Omit for an in-memory ledger.",
+          "isRequired": false
+        },
+        {
+          "name": "CICASH_MERCHANTS",
+          "description": "Comma-separated payee ids to register.",
+          "isRequired": false,
+          "default": "api.search,api.gpu"
+        }
       ]
     }
   ]

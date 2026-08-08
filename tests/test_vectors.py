@@ -10,10 +10,10 @@ import json
 import os
 import unittest
 
-from agentcash.caveats import ser, MAX_TOTAL
-from agentcash.models import Receipt, digest
-from agentcash.protocol import _sign
-from agentcash.token import Token, mint, verify_sig, canonical_request
+from cicash.caveats import ser, MAX_TOTAL
+from cicash.models import Receipt, digest
+from cicash.protocol import _sign
+from cicash.token import Token, mint, verify_sig, canonical_request
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VECTORS = os.path.join(HERE, "spec", "vectors.json")

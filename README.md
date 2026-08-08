@@ -1,8 +1,12 @@
-# agentcash
+# CIcash
 
 **A budget you lend to an AI agent — not money you give it.**
 
 Bounded · expiring · revocable · auditable · worthless once stolen.
+
+The unit of account is the **CIcash**. It is deliberately boring: if the unit
+appreciates, agents hoard it and the payment layer dies — that is Gresham's law,
+and it is how Bitcoin stopped being cash and became a thing people keep.
 
 **Two independent implementations, held to one published conformance suite.**
 Python (stdlib only; `cryptography` optional for Ed25519) and JavaScript
@@ -29,7 +33,7 @@ So this keeps Bitcoin's L0 philosophy — **commitments that cannot be loosened,
 anyone can verify, cost as the anti-spam mechanism** — and inverts its key model
 completely.
 
-| | Bitcoin | agentcash |
+| | Bitcoin | CIcash |
 |---|---|---|
 | authority | unlimited, eternal | bounded, expiring |
 | delegation | impossible | offline, attenuation-only |
@@ -55,7 +59,7 @@ for the next link, so any holder can *append* a constraint offline — and nobod
 → `test_removing_a_caveat_breaks_signature`, `test_widening_would_be_inert_even_if_forced`
 
 **2. Attenuation is economic, not just syntactic.**
-A payment debits **every ancestor**. An agent capped at $50 cannot mint ten $50
+A payment debits **every ancestor**. An agent capped at 50 CIcash cannot mint ten 50-CIcash
 children. Rate limits attenuate the same way.
 → `test_cannot_escape_parent_cap_by_forking_children`, `test_deep_chain_still_bound`
 
@@ -107,23 +111,23 @@ agent can reach is deliberately unable to express *"give me more."*
 ### Python
 
 ```python
-from agentcash import Ledger, usd
+from cicash import Ledger, ci
 
 led   = Ledger.sqlite("ac.db")
 acme  = led.register_principal("acme-corp")
 api   = led.register_merchant("api.search")
 
 agent = acme.grant(
-    budget   = usd(50),
-    per_tx   = usd(5),
-    rate     = {"max_count": 20, "max_amount": usd(10), "window_s": 60},
+    budget   = ci(50),
+    per_tx   = ci(5),
+    rate     = {"max_count": 20, "max_amount": ci(10), "window_s": 60},
     ttl_s    = 24 * 3600,
     payees   = ["api.search"],
     purposes = ["research"],
 )
 
-receipt = agent.pay(api.quote(usd(2), "research"), idem_key="run1/step3")
-sub     = agent.delegate(budget=usd(5), note="sub: summarise")   # offline, tighter only
+receipt = agent.pay(api.quote(ci(2), "research"), idem_key="run1/step3")
+sub     = agent.delegate(budget=ci(5), note="sub: summarise")   # offline, tighter only
 acme.revoke(agent)                                               # kills sub too
 led.audit_verify()
 ```
@@ -134,9 +138,9 @@ The model gets tools; the key stays in the server process. A credential that nev
 enters a context window cannot leak out of one.
 
 ```json
-{"mcpServers": {"agentcash": {
-  "command": "python3", "args": ["-m", "agentcash.mcp_server"],
-  "env": {"AGENTCASH_DB": "/abs/ac.db", "AGENTCASH_WALLET": "/abs/wallet.json"}}}}
+{"mcpServers": {"cicash": {
+  "command": "python3", "args": ["-m", "cicash.mcp_server"],
+  "env": {"CICASH_DB": "/abs/ac.db", "CICASH_WALLET": "/abs/wallet.json"}}}}
 ```
 
 Tools: `budget_check` · `budget_quote` · `budget_pay` · `budget_delegate` ·
@@ -145,7 +149,7 @@ Tools: `budget_check` · `budget_quote` · `budget_pay` · `budget_delegate` ·
 ### Any language, over HTTP
 
 ```bash
-python3 -m agentcash.cli --db ac.db serve      # 127.0.0.1:8402
+python3 -m cicash.cli --db ac.db serve      # 127.0.0.1:8402
 ```
 
 `402` budget · `401` proof · `403` revoked · `429` rate (with `Retry-After`).
@@ -155,10 +159,10 @@ unused because humans were never the ones being metered. Agents are.
 ### Operator CLI
 
 ```bash
-agentcash --db ac.db grant --budget 50 --per-tx 5 --payees api.search --out wallet.json
-agentcash --db ac.db balance --wallet wallet.json
-agentcash --db ac.db revoke  --wallet wallet.json
-agentcash --db ac.db audit
+cicash --db ac.db grant --budget 50 --per-tx 5 --payees api.search --out wallet.json
+cicash --db ac.db balance --wallet wallet.json
+cicash --db ac.db revoke  --wallet wallet.json
+cicash --db ac.db audit
 ```
 
 ---
@@ -220,11 +224,12 @@ Stated plainly, because a payment library that oversells itself is worse than no
 
 ## Publishing
 
-See [PUBLISH.md](PUBLISH.md). One thing to know before you pick names: **`agentcash`
-is already taken on npm** by an active package in this same space (v0.17.1, tagged
-`mcp · x402 · payments · ai`). The JavaScript package here is therefore
-`agentcash-protocol`. That collision is worth a deliberate decision rather than a
-default — the reasoning is in PUBLISH.md.
+See [PUBLISH.md](PUBLISH.md). `cicash` is free on both PyPI and npm — checked.
+
+The project was called `agentcash` until the unit got a name, which turned out to
+matter twice: `agentcash` is already taken on npm by an active package in this same
+space (v0.17.1, tagged `mcp · x402 · payments · ai`). That project is a **payment
+rail**; this one is an **authority layer**. Complementary, but worth saying clearly.
 
 ---
 

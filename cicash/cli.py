@@ -1,13 +1,13 @@
 """Operator CLI. The principal's side of the fence.
 
 Everything here widens or inspects. Nothing an agent runs lives in this file -
-that separation is the point, and it is why `agentcash grant` is a shell
+that separation is the point, and it is why `cicash grant` is a shell
 command a human types and `budget_check` is a tool a model calls.
 
-    python3 -m agentcash.cli grant --db ac.db --budget 50 --out wallet.json
-    python3 -m agentcash.cli balance --db ac.db --wallet wallet.json
-    python3 -m agentcash.cli revoke  --db ac.db --wallet wallet.json
-    python3 -m agentcash.cli audit   --db ac.db
+    python3 -m cicash.cli grant --db ac.db --budget 50 --out wallet.json
+    python3 -m cicash.cli balance --db ac.db --wallet wallet.json
+    python3 -m cicash.cli revoke  --db ac.db --wallet wallet.json
+    python3 -m cicash.cli audit   --db ac.db
 """
 
 import argparse
@@ -15,7 +15,7 @@ import json
 import sys
 
 from .ledger import Ledger, Wallet
-from .money import usd, fmt
+from .money import ci, fmt
 
 
 def _led(a):
@@ -31,11 +31,11 @@ def cmd_grant(a):
     rate = None
     if a.rate_count or a.rate_amount:
         rate = {"max_count": a.rate_count,
-                "max_amount": usd(a.rate_amount) if a.rate_amount else None,
+                "max_amount": ci(a.rate_amount) if a.rate_amount else None,
                 "window_s": a.rate_window}
     w = p.grant(
-        budget=usd(a.budget),
-        per_tx=usd(a.per_tx) if a.per_tx else None,
+        budget=ci(a.budget),
+        per_tx=ci(a.per_tx) if a.per_tx else None,
         rate=rate,
         ttl_s=a.ttl_h * 3600 if a.ttl_h else None,
         payees=[x for x in (a.payees or "").split(",") if x] or None,
@@ -49,7 +49,7 @@ def cmd_grant(a):
         import os
         os.chmod(a.out, 0o600)
         print(f"wrote {a.out}  (mode 600 - this file is a credential)")
-        print(f"token {w.token.token_id}   budget {fmt(usd(a.budget))}")
+        print(f"token {w.token.token_id}   budget {fmt(ci(a.budget))}")
     else:
         print(blob)
 
@@ -101,7 +101,7 @@ def cmd_serve(a):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="agentcash")
+    ap = argparse.ArgumentParser(prog="cicash")
     ap.add_argument("--db", default=None, help="sqlite path (omit = in-memory)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 

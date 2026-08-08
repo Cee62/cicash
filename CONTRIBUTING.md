@@ -31,7 +31,7 @@ This is the most valuable contribution available. The bar is:
 2. implement §7 evaluation **in order**, including 7.1 ancestor debit
 3. expose no API that can widen a budget
 
-Two things bite every implementer, both documented in `agentcash/canonical.py`:
+Two things bite every implementer, both documented in `cicash/canonical.py`:
 integral floats rendering differently across languages, and non-ASCII escaping.
 Both are settled in SPEC §2 — read it before writing the encoder.
 

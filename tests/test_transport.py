@@ -3,10 +3,10 @@
 import json
 import unittest
 
-from agentcash import Ledger, usd, Denied, crypto
-from agentcash.client import RemoteWallet
-from agentcash.mcp_server import Server, TOOLS
-from agentcash.service import Api, build_demo, serve
+from cicash import Ledger, ci, Denied, crypto
+from cicash.client import RemoteWallet
+from cicash.mcp_server import Server, TOOLS
+from cicash.service import Api, build_demo, serve
 
 
 class TestHttp(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestHttp(unittest.TestCase):
         cls.httpd = serve(cls.api, port=8499, background=True)
         cls.base = "http://127.0.0.1:8499"
         acme = cls.led.register_principal("acme")
-        cls.w = acme.grant(budget=usd(20), per_tx=usd(5),
+        cls.w = acme.grant(budget=ci(20), per_tx=ci(5),
                            payees=["api.search"], purposes=["research"])
 
     @classmethod
@@ -30,21 +30,21 @@ class TestHttp(unittest.TestCase):
     def test_remote_pay_matches_local_semantics(self):
         w = self.rw()
         before = w.balance()["available"]
-        q = w.quote("api.search", usd(2), "research")
+        q = w.quote("api.search", ci(2), "research")
         r = w.pay(q, idem_key="http/1")
-        self.assertEqual(r["amount"], usd(2))
-        self.assertEqual(w.balance()["available"], before - usd(2))
+        self.assertEqual(r["amount"], ci(2))
+        self.assertEqual(w.balance()["available"], before - ci(2))
 
     def test_retry_over_http_is_free(self):
         w = self.rw()
-        q = w.quote("api.search", usd(1), "research")
+        q = w.quote("api.search", ci(1), "research")
         a = w.pay(q, idem_key="http/retry")
         b = w.pay(q, idem_key="http/retry")
         self.assertEqual(a["receipt_id"], b["receipt_id"])
 
     def test_denial_crosses_the_wire_with_its_action(self):
         w = self.rw()
-        q = w.quote("api.gpu", usd(1), "research")     # payee not on allowlist
+        q = w.quote("api.gpu", ci(1), "research")     # payee not on allowlist
         with self.assertRaises(Denied) as e:
             w.pay(q, idem_key="http/deny")
         self.assertEqual(e.exception.reason, "PAYEE_NOT_ALLOWED")
@@ -54,12 +54,12 @@ class TestHttp(unittest.TestCase):
     def test_status_codes_are_semantic(self):
         st, body = self.api.handle("POST", "/v1/authorize", {
             "token": self.w.token.to_dict(), "pop": "00", "idem_key": "x",
-            "quote": self.api.merchants["api.search"].quote(usd(1), "research").to_dict(),
+            "quote": self.api.merchants["api.search"].quote(ci(1), "research").to_dict(),
         }, {})
         self.assertEqual(st, 401)                      # bad proof -> unauthorized
         self.assertEqual(body["denied"], "POP_INVALID")
 
-        big = self.api.merchants["api.search"].quote(usd(99), "research")
+        big = self.api.merchants["api.search"].quote(ci(99), "research")
         st2, body2 = self.api.handle("POST", "/v1/authorize", {
             "token": self.w.token.to_dict(),
             "pop": self.w._pop(big, "y"), "quote": big.to_dict(), "idem_key": "y",
@@ -72,7 +72,7 @@ class TestHttp(unittest.TestCase):
         self.assertEqual(st, 402)
         q = body["quote"]
         w = self.rw()
-        from agentcash.protocol import Quote
+        from cicash.protocol import Quote
         r = w.pay(Quote.from_dict(q), idem_key="402/flow")
         st2, body2 = self.api.handle("GET", "/demo/premium", {},
                                      {"receipt": [r["receipt_id"]]})
@@ -82,20 +82,20 @@ class TestHttp(unittest.TestCase):
     @unittest.skipUnless(crypto.HAVE_ED25519, "needs ed25519")
     def test_remote_delegation_is_offline_and_still_bound(self):
         w = self.rw()
-        blob = w.delegate(budget=usd(2), note="sub")   # no network call
+        blob = w.delegate(budget=ci(2), note="sub")   # no network call
         sub = RemoteWallet(self.base, blob)
-        q = sub.quote("api.search", usd(1), "research")
+        q = sub.quote("api.search", ci(1), "research")
         sub.pay(q, idem_key="sub/1")
-        self.assertEqual(sub.balance()["available"], usd(1))
+        self.assertEqual(sub.balance()["available"], ci(1))
         with self.assertRaises(Denied):
-            w.delegate(budget=usd(999))
+            w.delegate(budget=ci(999))
 
 
 class TestMcp(unittest.TestCase):
     def setUp(self):
         self.led, api = build_demo()
         acme = self.led.register_principal("acme")
-        self.w = acme.grant(budget=usd(10), per_tx=usd(3),
+        self.w = acme.grant(budget=ci(10), per_tx=ci(3),
                             payees=["api.search"], purposes=["research"])
         self.srv = Server(self.w, api.merchants)
 
@@ -119,20 +119,20 @@ class TestMcp(unittest.TestCase):
     def test_check_quote_pay_round_trip(self):
         chk = self.rpc("tools/call", {"name": "budget_check"})["result"]
         self.assertFalse(chk["isError"])
-        self.assertEqual(chk["structuredContent"]["available"], "$10")
+        self.assertEqual(chk["structuredContent"]["available"], "10 CIcash")
 
         q = self.rpc("tools/call", {"name": "budget_quote", "arguments": {
-            "payee": "api.search", "amount_usd": 2, "purpose": "research"}})
+            "payee": "api.search", "amount": 2, "purpose": "research"}})
         quote = q["result"]["structuredContent"]
 
         pay = self.rpc("tools/call", {"name": "budget_pay", "arguments": {
             "quote": quote, "idem_key": "mcp/1"}})["result"]
         self.assertFalse(pay["isError"])
-        self.assertEqual(pay["structuredContent"]["remaining"], "$8")
+        self.assertEqual(pay["structuredContent"]["remaining"], "8 CIcash")
 
     def test_denial_is_structured_not_a_wall(self):
         q = self.rpc("tools/call", {"name": "budget_quote", "arguments": {
-            "payee": "api.gpu", "amount_usd": 1, "purpose": "research"}})
+            "payee": "api.gpu", "amount": 1, "purpose": "research"}})
         res = self.rpc("tools/call", {"name": "budget_pay", "arguments": {
             "quote": q["result"]["structuredContent"], "idem_key": "mcp/2"}})["result"]
         self.assertTrue(res["isError"])
@@ -149,11 +149,11 @@ class TestMcp(unittest.TestCase):
 
     def test_delegate_tool_returns_a_tighter_wallet(self):
         res = self.rpc("tools/call", {"name": "budget_delegate", "arguments": {
-            "budget_usd": 2, "note": "sub: summarise"}})["result"]
+            "budget": 2, "note": "sub: summarise"}})["result"]
         blob = res["structuredContent"]["wallet"]
-        from agentcash import Wallet
+        from cicash import Wallet
         sub = Wallet.from_dict(self.led, blob)
-        self.assertEqual(sub.balance()["available"], usd(2))
+        self.assertEqual(sub.balance()["available"], ci(2))
         self.assertIn("credential", res["structuredContent"]["warning"])
 
     def test_unknown_method(self):

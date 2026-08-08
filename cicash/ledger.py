@@ -2,9 +2,9 @@
 
 Three ideas here are load-bearing and easy to miss:
 
-* SPENDING DEBITS EVERY ANCESTOR. If a sub-sub-agent spends $1, the budget of
-  every token above it drops by $1 too. Without this, attenuation is only
-  syntax: an agent capped at $50 could mint ten children of $50 each. Here the
+* SPENDING DEBITS EVERY ANCESTOR. If a sub-sub-agent spends 1 CIcash, the budget
+  of every token above it drops by 1 too. Without this, attenuation is only
+  syntax: an agent capped at 50 could mint ten children of 50 each. Here the
   cap is economic, and it holds no matter how deep the delegation goes.
 
 * REVOCATION IS SUBTREE-WIDE AND INSTANT. Killing a token kills everything ever
@@ -286,7 +286,7 @@ class Ledger:
 
     # Order matters: report the most fundamental violation first. "You are not
     # allowed to pay this party at all" is a very different signal to a planner
-    # than "that is $2 over your per-call cap", and if both are true the agent
+    # than "that is 2 CIcash over your per-call cap", and if both are true the agent
     # should hear the first one.
     _CHECK_ORDER = (cv.EXPIRES, cv.PAYEES, cv.PURPOSE, cv.MAX_PER_TX)
 

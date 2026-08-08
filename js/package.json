@@ -1,7 +1,7 @@
 {
-  "name": "agentcash-protocol",
-  "version": "0.3.0",
-  "description": "A budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority.",
+  "name": "cicash",
+  "version": "0.4.0",
+  "description": "CIcash - a budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority.",
   "type": "module",
   "main": "src/index.js",
   "exports": {
@@ -34,7 +34,7 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/agentcash.git",
+    "url": "git+https://github.com/OWNER/cicash.git",
     "directory": "js"
   }
 }

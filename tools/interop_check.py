@@ -17,9 +17,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from agentcash import Ledger, Wallet, usd, fmt, crypto
-from agentcash.protocol import Quote
-from agentcash.token import Token
+from cicash import Ledger, Wallet, ci, fmt, crypto
+from cicash.protocol import Quote
+from cicash.token import Token
 
 JS = r"""
 import { readFileSync, writeFileSync } from "node:fs";
@@ -61,17 +61,17 @@ def main():
     led = Ledger()
     acme = led.register_principal("acme")
     api = led.register_merchant("api.search", key=b"shared-merchant-key")
-    wallet = acme.grant(budget=usd(50), per_tx=usd(5), payees=["api.search"],
+    wallet = acme.grant(budget=ci(50), per_tx=ci(5), payees=["api.search"],
                         purposes=["research"], note="issued by python")
-    quote = api.quote(usd(3), "research", ttl_s=3600)
+    quote = api.quote(ci(3), "research", ttl_s=3600)
 
     io = {
         "root_key_hex": led.store.get_root_key("acme").hex(),
         "wallet": wallet.to_dict(),
         "quote": quote.to_dict(),
         "idem": "interop/1",
-        "child_budget": usd(4),
-        "child_amount": usd(2),
+        "child_budget": ci(4),
+        "child_amount": ci(2),
         "child_idem": "interop/child-1",
     }
 
@@ -92,12 +92,12 @@ def main():
     hold = led.authorize(wallet.token, js["pop"], quote, "interop/1")
     receipt = led.settle(hold.hold_id, hold.amount, "interop/1s")
     ok.append(("python settled a javascript-signed payment",
-               receipt.amount == usd(3)))
+               receipt.amount == ci(3)))
 
     # The wallet JavaScript delegated, entirely offline, spends against Python.
     child = Wallet.from_dict(led, js["child_wallet"])
     ok.append(("child token verifies in python", child.token.depth == 1))
-    q2 = api.quote(usd(2), "research", ttl_s=3600)
+    q2 = api.quote(ci(2), "research", ttl_s=3600)
     # re-sign for this quote id, since the proof commits to the whole request
     h2 = led.authorize(child.token,
                        child.signer.sign(
@@ -109,14 +109,15 @@ def main():
     parent_left = led.balance(wallet.token)["available"]
     child_left = led.balance(child.token)["available"]
     ok.append(("ancestor debit crossed the language boundary",
-               parent_left == usd(45) and child_left == usd(2)))
+               parent_left == ci(45) and child_left == ci(2)))
 
     ok.append(("audit chain intact", led.audit_verify()))
 
     width = max(len(n) for n, _ in ok)
     for name, passed in ok:
         print(f"  {'PASS' if passed else 'FAIL'}  {name.ljust(width)}")
-    print(f"\n  parent {fmt(parent_left)} left of $50   child {fmt(child_left)} left of $4")
+    print(f"\n  parent {fmt(parent_left)} left of {fmt(ci(50))}   "
+          f"child {fmt(child_left)} left of {fmt(ci(4))}")
     if not all(p for _, p in ok):
         sys.exit(1)
     print("\n  cross-language interop: OK")

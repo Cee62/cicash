@@ -12,7 +12,7 @@ because humans were never the ones being metered. Agents are.
 An agent that already knows HTTP knows how to behave here without being taught
 anything new.
 
-Run:  python3 -m agentcash.service --demo
+Run:  python3 -m cicash.service --demo
 """
 
 import json
@@ -22,7 +22,7 @@ from urllib.parse import urlparse, parse_qs
 
 from .errors import Denied, AuditBroken, RETRY_AFTER
 from .ledger import Ledger
-from .money import usd
+from .money import ci
 from .protocol import Quote
 from .token import Token
 
@@ -57,7 +57,7 @@ class Api:
 
     # -- meta ---------------------------------------------------------------
     def _get_v1_health(self, b, q):
-        return 200, {"ok": True, "service": "agentcash"}
+        return 200, {"ok": True, "service": "cicash"}
 
     def _get_v1_profile(self, b, q):
         return 200, self.ledger.security_profile()
@@ -104,7 +104,7 @@ class Api:
         if not rid:
             return 402, {
                 "error": "payment_required",
-                "quote": m.quote(usd(0.01), "research", ttl_s=120).to_dict(),
+                "quote": m.quote(ci(0.01), "research", ttl_s=120).to_dict(),
                 "hint": "pay this quote, then retry with ?receipt=<receipt_id>",
             }
         r = self.ledger.store.get_receipt(rid)
@@ -151,7 +151,7 @@ def serve(api: Api, host="127.0.0.1", port=8402, background=False):
     if background:
         threading.Thread(target=httpd.serve_forever, daemon=True).start()
         return httpd
-    print(f"agentcash serving on http://{host}:{port}")
+    print(f"cicash serving on http://{host}:{port}")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -169,7 +169,7 @@ def build_demo(db=None):
 
 if __name__ == "__main__":                                      # pragma: no cover
     import argparse
-    ap = argparse.ArgumentParser(description="agentcash HTTP service")
+    ap = argparse.ArgumentParser(description="cicash HTTP service")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8402)
     ap.add_argument("--db", default=None, help="sqlite path (omit for in-memory)")

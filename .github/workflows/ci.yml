@@ -17,7 +17,7 @@ jobs:
         run: |
           pip install cryptography
           python -m unittest discover -s tests -t . -v
-          python -c "from agentcash import Ledger; p=Ledger().security_profile(); assert p['ed25519_available'], p"
+          python -c "from cicash import Ledger; p=Ledger().security_profile(); assert p['ed25519_available'], p"
 
   javascript:
     runs-on: ubuntu-latest

@@ -14,10 +14,10 @@ import sys
 
 sys.path.insert(0, ".")
 
-from agentcash.caveats import ser, MAX_TOTAL, MAX_PER_TX, RATE, EXPIRES, PAYEES, PURPOSE
-from agentcash.models import Receipt, digest
-from agentcash.protocol import _sign
-from agentcash.token import mint, verify_sig, canonical_request
+from cicash.caveats import ser, MAX_TOTAL, MAX_PER_TX, RATE, EXPIRES, PAYEES, PURPOSE
+from cicash.models import Receipt, digest
+from cicash.protocol import _sign
+from cicash.token import mint, verify_sig, canonical_request
 
 ROOT_KEY = bytes.fromhex("00" * 32)
 MERCHANT_KEY = bytes.fromhex("11" * 32)

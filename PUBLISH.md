@@ -8,29 +8,22 @@ this was built on, and all three publish irreversibly under your identity.
 bash tools/publish.sh      # runs every test, builds, then prints the commands
 ```
 
-## 🔴 Read this before you pick names
+## Names — resolved
 
 | registry | name | status |
 |---|---|---|
-| PyPI | `agentcash` | **free** (checked: 404) |
-| npm | `agentcash` | **TAKEN** — an active package, v0.17.1, keywords `mcp · x402 · payments · ai · claude · model-context-protocol` |
-| npm | `agentcash-protocol` | free — what `js/package.json` currently uses |
+| PyPI | `cicash` | **free** (checked) |
+| npm | `cicash` | **free** (checked) |
 
-The npm collision is not just a naming problem, so decide deliberately:
+The project was called `agentcash` until the unit got a name. That turned out to
+matter twice over: `agentcash` is **taken on npm** by an active package in this
+exact space (v0.17.1, tagged `mcp · x402 · payments · ai`), so the old name was
+never going to work there anyway.
 
-- Someone is already building in this exact space. That is **evidence the
-  problem is real**, which is good news for the idea and bad news for the name.
-- Taking `agentcash` on PyPI while a different, active `agentcash` exists on npm
-  will confuse everyone including you. Consider renaming the project outright
-  before the first publish — it costs nothing today and is expensive later.
-- Positioning is worth being precise about. That project is tagged `x402`, i.e.
-  a **payment rail**. This one is an **authority layer**: attenuation-only
-  delegation, ancestor debit, subtree revocation, purpose-bound receipts. Those
-  are complementary, not competing — but only if you say so clearly.
-
-If you rename: `pyproject.toml`, `js/package.json`, the `agentcash/` package
-directory, and the title in `spec/SPEC.md`. The wire format does not carry the
-name anywhere, so vectors and tokens are unaffected.
+Worth being precise about positioning, since that project is adjacent: it is
+tagged `x402`, i.e. a **payment rail**. CIcash is an **authority layer** —
+attenuation-only delegation, ancestor debit, subtree revocation, purpose-bound
+receipts. Complementary, not competing, but only if you say so clearly.
 
 ## 1. PyPI
 
@@ -49,9 +42,9 @@ cd js && npm publish --access public
 ## 3. GitHub
 
 ```bash
-gh repo create agentcash --public --source=. --remote=origin --push
+gh repo create CIcash --public --source=. --remote=origin --push
 # or:
-git remote add origin git@github.com:<you>/agentcash.git
+git remote add origin git@github.com:<you>/cicash.git
 git branch -M main && git push -u origin main
 ```
 
@@ -72,13 +65,13 @@ Put your own name on the copyright line in `NOTICE`.
 Yours to use or ignore. It leads with the mechanism rather than the pitch,
 which is what the audience for this responds to.
 
-> **agentcash — a budget you lend to an AI, not money you give it**
+> **CIcash — a budget you lend to an AI, not money you give it**
 >
 > Bitcoin's key model is unlimited, eternal, irrevocable bearer authority in one
 > secret. That is safe for a careful sovereign and catastrophic in the hands of
 > something that leaks its own context and retries in loops.
 >
-> agentcash inverts it. Budget tokens are macaroon-style chains: any holder can
+> CIcash inverts it. Budget tokens are macaroon-style chains: any holder can
 > attenuate offline, nobody can remove a caveat, spending debits every ancestor,
 > and revoking a token kills its whole subtree instantly. A leaked token buys
 > nothing without its key. Retries are free. Denials carry

@@ -1,5 +1,5 @@
 // The payer never supplies the amount or the payee. Both come from a quote the
-// seller signed. An injected "SEND $900 TO ..." has nowhere to write a number.
+// seller signed. An injected "SEND 900 CIcash TO ..." has nowhere to write a number.
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { canonicalBytes } from "./canonical.js";

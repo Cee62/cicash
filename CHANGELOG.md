@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.0
+
+**The unit of account has a name: the CIcash.** Until now the money in this
+system was anonymous — "micro-units of the settlement unit" — which quietly
+implied dollars in every example and committed to nothing.
+
+- `usd()` is now `ci()`; `fmt()` renders `50 CIcash` rather than `$50`.
+- The package, the CLI, the npm module and the environment variables are all
+  `cicash` / `CICASH_*`. The project was `agentcash`, which was **taken on npm**
+  by an active package in the same space; `cicash` is free on both registries.
+- **The wire format did not change.** Amounts were always bare integers, so
+  `spec/vectors.json` is byte-identical, every previously minted token still
+  verifies, and the two implementations still agree. Naming the unit fixes what
+  the integer *means*, which every party to a payment had to agree on anyway.
+- SPEC §1 is now "Unit of account", and states that the name is not carried on
+  the wire — a deployment may denominate in something else without invalidating
+  a vector.
+
 ## 0.3.0
 
 Writing a second implementation is what this release is. It turned the format
@@ -14,7 +32,7 @@ be held to — and it found two real interoperability bugs on the way.
   wallet, JavaScript verifies it, signs a payment and delegates a tighter child
   entirely offline, then Python settles both and confirms the ancestor debit
   crossed the boundary. Runs in CI.
-- **`agentcash/canonical.py`** — one encoder for everything signed or hashed.
+- **`cicash/canonical.py`** — one encoder for everything signed or hashed.
 - CI across Python 3.9-3.13 and Node 18/20/22, plus a guard that fails the build
   if `spec/vectors.json` drifts from its generator.
 - `SECURITY.md`, `CONTRIBUTING.md`, `PUBLISH.md`, MCP registry manifest.
