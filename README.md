@@ -20,6 +20,10 @@ python3 tools/interop_check.py                   # python mints it, javascript s
 bash examples/quickstart.sh                      # a real wallet in 4 commands
 ```
 
+📄 **[OVERVIEW.md](OVERVIEW.md)** — the design note: the problem, what Bitcoin got
+right and wrong, the mechanism, the evidence, and what this is not.
+🇹🇭 **[OVERVIEW.th.md](OVERVIEW.th.md)** — ฉบับภาษาไทย เข้าใจง่าย อ่านรวดเดียวจบ
+
 ---
 
 ## The thesis
