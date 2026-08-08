@@ -30,7 +30,10 @@ cicash = "cicash.cli:main"
 cicash-mcp = "cicash.mcp_server:main"
 
 [project.urls]
-Specification = "https://github.com/cicash/cicash/blob/main/spec/SPEC.md"
+Homepage = "https://github.com/Cee62/cicash"
+Specification = "https://github.com/Cee62/cicash/blob/main/spec/SPEC.md"
+Changelog = "https://github.com/Cee62/cicash/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Cee62/cicash/issues"
 
 [tool.hatch.build.targets.sdist]
 include = ["cicash", "tests", "spec", "tools", "examples", "README.md",

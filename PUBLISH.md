@@ -44,7 +44,7 @@ cd js && npm publish --access public
 ```bash
 gh repo create CIcash --public --source=. --remote=origin --push
 # or:
-git remote add origin git@github.com:<you>/cicash.git
+git remote add origin git@github.com:Cee62/cicash.git
 git branch -M main && git push -u origin main
 ```
 
