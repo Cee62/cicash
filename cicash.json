@@ -1,6 +1,6 @@
 {
   "name": "cicash",
-  "version": "0.4.0",
+  "version": "0.4.3",
   "summary": "A budget you lend to an AI agent, not money you give it.",
   "license": "Apache-2.0",
   "audited": false,
@@ -21,24 +21,26 @@
     {
       "language": "python",
       "path": "cicash/",
-      "tests": 54,
+      "tests": 56,
       "dependencies": [],
       "optional_dependencies": [
         "cryptography"
-      ]
+      ],
+      "package": "cicash"
     },
     {
       "language": "javascript",
       "path": "js/",
       "tests": 24,
       "dependencies": [],
-      "runtime": "node>=18"
+      "runtime": "node>=18",
+      "package": "cicash"
     }
   ],
   "interop_proof": "tools/interop_check.py",
   "zero_install": {
     "file": "dist/cicash_single.py",
-    "sha256": "b4472bad3df048e1e68fcb04fc46361d417d952345fb9c26794262758b22a2d0",
+    "sha256": "55df05d07b9e0a4bebd16afe962c8f970710dc02ff3442d04554c605e30366dd",
     "run": "python3 cicash_single.py",
     "effect": "self-test proving 11 invariants, exit 0 on pass"
   },
@@ -72,5 +74,21 @@
     "agents": "AGENTS.md",
     "design": "OVERVIEW.md",
     "index": "llms.txt"
+  },
+  "install": {
+    "python": "pip install cicash",
+    "javascript": "npm install cicash",
+    "zero_install": "curl the cicash_single.py release asset, then python3 cicash_single.py"
+  },
+  "registries": {
+    "pypi": "https://pypi.org/project/cicash/",
+    "npm": "https://www.npmjs.com/package/cicash",
+    "source": "https://github.com/Cee62/cicash",
+    "archive": "swh:1:snp:185c0230818abdb4d0532b330adb5ae2c7d845da",
+    "published_via": "OIDC trusted publishing on both registries; no long-lived credential exists"
+  },
+  "worked_example": {
+    "path": "examples/llm_budget.py",
+    "what": "CIcash wrapped around the Claude API: reserve the worst case from count_tokens plus max_tokens, settle the truth from response.usage"
   }
 }

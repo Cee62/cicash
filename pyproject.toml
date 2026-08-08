@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cicash"
-version = "0.4.2"
+version = "0.4.3"
 description = "CIcash - a budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority."
 readme = "README.md"
 requires-python = ">=3.9"

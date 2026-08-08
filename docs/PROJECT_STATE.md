@@ -28,7 +28,8 @@ v0.4.2 is published and installable. Two independent implementations — Python
 (`cicash/`, 56 tests) and JavaScript (`js/`, 24 tests) — are held to one
 conformance suite (`spec/vectors.json`) and CI proves a wallet minted in one is
 spent by the other. There is an MCP server, an HTTP binding, an operator CLI,
-and a zero-install single-file build. **There is no settlement layer, no
+a zero-install single-file build, and a worked example
+(`examples/llm_budget.py`) wrapping the Claude API in a budget. **There is no settlement layer, no
 issuance, and no audit.** Total CIcash in existence: zero, deliberately.
 
 ## 3. Things that are deliberate. Do not "fix" them.
@@ -99,6 +100,13 @@ guards it.
 `tools/build_single_file.py` is deterministic; the release workflow fails if the
 committed file is stale.
 
+**Rendering is not on the wire, so the vectors do not cover it.** `fmt()` feeds
+`available_str`, which is part of the balance object an agent reads — and the
+two implementations once disagreed about it (`47 CIcash` vs `$47`) with every
+test passing. `tools/interop_check.py` now compares rendered amounts across the
+language boundary. Anything else that is API-visible but not on the wire needs
+the same treatment; the conformance vectors will not catch it.
+
 **The release tag must equal `cicash.__version__`.** The workflow checks it.
 
 **Concurrency**: the read-check-write span in `settle()` is the critical
@@ -155,7 +163,7 @@ In rough order of what would matter most:
    backwards.
 5. A Go implementation against the same vectors.
 
-## 7. Two lessons worth not relearning
+## 7. Three lessons worth not relearning
 
 **The second implementation is what makes a spec real.** JavaScript took an
 afternoon and immediately found two silent cross-language bugs (§4) that the
@@ -166,7 +174,16 @@ were defaults*. The same argument applies to a third one.
 **CI catches what one machine cannot.** The first public run went red on two
 things the dev box could never have shown: `node --test <dir>` changed meaning
 in Node 22, and `setup-node` can no longer provision the EOL Node 18. A green
-local suite is evidence about one environment.
+local suite is evidence about one environment. (The docs kept telling people to
+run the broken command for two releases after CI stopped doing so — when a
+command changes, grep the prose for it too.)
+
+**Publishing is itself a test, and nothing else substitutes for it.** The
+`$47`/`47 CIcash` divergence survived 80 passing tests and appeared the moment
+the npm package was installed the way a stranger would install it. The npm
+release leg failed the first time it ran, for two stacked reasons, neither
+visible until it ran. Install your own artifact; run your own pipeline end to
+end before you need it.
 
 ---
 

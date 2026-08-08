@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.4.3
+
+A documentation pass, prompted by everything the last three releases taught.
+No code changes.
+
+The npm package page was showing three things that were wrong, and a package
+README only updates when you publish, so they needed a release:
+
+- `import { … } from "CIcash"` — the wrong case. It would not resolve. The
+  rename to CIcash had over-capitalised an identifier inside a code block.
+- `Node >= 18`, contradicting `package.json`, which requires 20.
+- `node --test test/`, which breaks on Node 22 — the exact failure CI caught
+  two releases ago, still being recommended to readers.
+
+That last one had also been sitting in README.md and CONTRIBUTING.md. **When a
+command changes, grep the prose for it too**; CI stopped running the broken
+form long before the docs stopped teaching it.
+
+Also brought current: test counts (54 → 56 Python, 78 → 80 total), install
+instructions on every surface now that both registries carry the package, the
+machine-readable `cicash.json` manifest, `llms.txt`, the Thai overview's
+"how to publish" section (it still said publishing was impossible), and
+`PUBLISH.md`, which is now a description of how releases work rather than a
+plan for making them work.
+
+`docs/PROJECT_STATE.md` gains a third lesson — *publishing is itself a test* —
+and a new trapdoor entry: **rendering is not on the wire, so the conformance
+vectors do not cover it.** That is how the `$47` / `47 CIcash` divergence
+survived 80 passing tests.
+
 ## 0.4.2
 
 Documentation, and the release that proves the pipeline needs no secrets.
@@ -12,6 +42,18 @@ The code is unchanged from 0.4.1. A release pipeline that has never run its
 npm leg is a pipeline that will fail the first time it matters, so this
 version exists to run it — the same reason every claim in this project has a
 test rather than a paragraph.
+
+It failed, which was the point. Two stacked causes produced one unhelpful
+`ENEEDAUTH`: the npm bundled with Node 22 predates OIDC trusted publishing and
+never looked for the identity token beside it, and `registry-url` on
+`setup-node` writes an `.npmrc` line that resolves to an *empty* auth token
+when no `NPM_TOKEN` secret exists — worse than no auth config, because npm
+stops and asks you to log in rather than falling through to OIDC. Both are
+fixed; `npm install cicash@0.4.2` carries a provenance attestation and 0.4.0
+and 0.4.1 do not.
+
+Docs were brought up to date in the same pass, including a command README and
+CONTRIBUTING had been recommending for two releases that breaks on Node 22.
 
 ## 0.4.1
 

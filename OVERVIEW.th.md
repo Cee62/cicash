@@ -170,7 +170,7 @@ AI retry เป็นธรรมชาติ ไม่ใช่บั๊กท�
 
 ## 7. หลักฐานว่ามันทำงานจริง
 
-**78 การทดสอบ ผ่านหมด** — ไม่ใช่คำโฆษณา แต่ละข้ออ้างมีเทสรองรับ
+**80 การทดสอบ ผ่านหมด** — ไม่ใช่คำโฆษณา แต่ละข้ออ้างมีเทสรองรับ
 
 | ข้ออ้าง | เทสที่พิสูจน์ |
 |---|---|
@@ -236,7 +236,7 @@ JS แตกกระเป๋าลูกที่แคบกว่าแบ�
 ├── spec/
 │   ├── SPEC.md              📜 มาตรฐาน (normative)
 │   └── vectors.json         🎯 test vector — ภาษาอื่นเอาไปตรวจตัวเอง
-├── tests/                   54 เทส Python
+├── tests/                   56 เทส Python
 ├── tools/
 │   ├── interop_check.py     Python ออก → JS จ่าย
 │   ├── gen_vectors.py       สร้าง vector
@@ -302,25 +302,34 @@ python3 -m cicash.cli --db ac.db serve   # 127.0.0.1:8402
 
 ---
 
-## 12. เหลืออะไร
-
-**ผมเผยแพร่ขึ้น PyPI / npm / GitHub ไม่ได้** — เครื่องนี้ไม่มี credential ใดๆ
-(ไม่มี private SSH key, ไม่มี token, ไม่มี `gh`) และการอัปโหลดต้อง authenticate ในนามคุณ
+## 12. เผยแพร่แล้ว — ใช้ได้จริงวันนี้
 
 ```bash
-bash /root/cicash/tools/publish.sh
+pip install cicash          # Python
+npm install cicash          # JavaScript
 ```
-รันเทสทั้งหมด → build → พิมพ์คำสั่งที่เหลือให้ (`twine upload` / `npm publish` / `gh repo create`)
 
-✅ ชื่อ `cicash` **ว่างทั้ง PyPI และ npm** (เช็คแล้ว)
-⚠️ ก่อนอัปโหลด: แก้บรรทัด copyright ใน `NOTICE` เป็นชื่อคุณ
+| | |
+|---|---|
+| **PyPI** | https://pypi.org/project/cicash/ |
+| **npm** | https://www.npmjs.com/package/cicash |
+| **GitHub** | https://github.com/Cee62/cicash |
+| **คลังถาวร** | Software Heritage `swh:1:snp:185c0230...` |
+| **ไม่ต้องติดตั้ง** | `cicash_single.py` แนบใน release · ไฟล์เดียว รันแล้วพิสูจน์ตัวเอง 11 ข้อ |
+
+**ทั้งสอง registry ปล่อยผ่าน OIDC (trusted publishing)** ⇒ ไม่มี `PYPI_TOKEN`
+และ `NPM_TOKEN` อยู่ที่ไหนเลย เวอร์ชันหน้าแค่ push tag ก็ปล่อยเองครบ
+
+ตรวจได้จากภายนอกว่าใช้ OIDC จริง: `registry.npmjs.org/cicash` จะโชว์
+`attestations` บนเวอร์ชันที่ปล่อยผ่าน CI (0.4.2 มี · 0.4.0/0.4.1 ไม่มี
+เพราะปล่อยด้วยมือ)
 
 ### ทางต่อไป
 1. netting + settlement เข้าหน่วยที่มีมูลค่าจริง
 2. ใบเสร็จแบบ blinded (เจ้าของตรวจได้ โลกมองไม่เห็น)
-3. ชั้นระงับข้อพิพาท **นอกเส้นทางจ่ายเงิน** — ผู้ขายได้เงินจบ เจ้าของมีทางเยียวยา
-   (ดีลที่ Bitcoin ไม่เคยทำ และบัตรเครดิตทำกลับด้าน)
-4. implementation ภาษาที่สาม (Go) — ตัว JavaScript ใช้เวลาบ่ายเดียว แต่คืนทุนสองเท่า
+3. ชั้นระงับข้อพิพาท **นอกเส้นทางจ่ายเงิน**
+4. implementation ภาษาที่สาม (Go) บน vector ชุดเดียวกัน
+5. security audit จากบุคคลที่สาม
 
 ---
 

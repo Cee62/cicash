@@ -9,8 +9,8 @@ designed against. Patches are judged against that first.
 ## Before you open a PR
 
 ```bash
-python3 -m unittest discover -s tests -t .   # 54 tests
-cd js && node --test test/                   # 24 tests
+python3 -m unittest discover -s tests -t .   # 56 tests
+cd js && node --test test/*.test.mjs         # 24 tests
 python3 tools/interop_check.py               # python issues, javascript spends
 ```
 

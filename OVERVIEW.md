@@ -191,7 +191,7 @@ Bitcoin stopped being cash and became a thing people keep.
 
 ## Evidence
 
-Every claim above has a test. **78 of them, all passing** — 54 in Python, 24 in
+Every claim above has a test. **80 of them, all passing** — 56 in Python, 24 in
 JavaScript.
 
 | Claim | Test |
@@ -331,7 +331,7 @@ implementation are documented there, and neither announces itself.
 
 ---
 
-Apache-2.0. Two implementations · 78 tests · zero required dependencies.
+Apache-2.0. Two implementations · 80 tests · zero required dependencies.
 
 > **Do not design money an AI owns. Design a budget it borrows, that you can
 > pull back within the second.** What makes Bitcoin safe in the hands of a

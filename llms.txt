@@ -13,6 +13,13 @@ a token kills its whole subtree instantly. A leaked token buys nothing without
 its key. Retries are free. Denials carry RETRY_AFTER / REPLAN / ESCALATE so a
 planner can act instead of looping.
 
+## Install
+
+`pip install cicash` (Python) · `npm install cicash` (JavaScript) · or fetch the
+single-file build from a GitHub release and run it with no install at all.
+Both packages are published through OIDC trusted publishing; no long-lived
+credential exists.
+
 ## For agents
 
 - [AGENTS.md](AGENTS.md): what an agent holds, and the four behaviours that change — check before planning, reuse idem_key, read `action` on denials, never invent a price or payee.

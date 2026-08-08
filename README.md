@@ -17,9 +17,14 @@ Python (stdlib only; `cryptography` optional for Ed25519) and JavaScript
 (`node:crypto` only, zero dependencies). They share no code.
 
 ```bash
+pip install cicash          # Python
+npm install cicash          # JavaScript
+```
+
+```bash
 python3 demo.py                                  # the whole story in 10 scenes
 python3 -m unittest discover -s tests -t .       # 56 tests
-cd js && node --test test/                       # 24 tests
+cd js && node --test test/*.test.mjs             # 24 tests
 python3 tools/interop_check.py                   # python mints it, javascript spends it
 bash examples/quickstart.sh                      # a real wallet in 4 commands
 python3 examples/llm_budget.py                   # a real paid API, capped
@@ -242,14 +247,14 @@ Stated plainly, because a payment library that oversells itself is worse than no
 
 ---
 
-## Publishing
+## Releasing
 
-See [PUBLISH.md](PUBLISH.md). `cicash` is free on both PyPI and npm — checked.
+`pip install cicash` · `npm install cicash` · both reached through **OIDC
+trusted publishing**, so no `PYPI_TOKEN` and no `NPM_TOKEN` secret exists
+anywhere. Cutting a release is a tag push; see [PUBLISH.md](PUBLISH.md).
 
-The project was called `agentcash` until the unit got a name, which turned out to
-matter twice: `agentcash` is already taken on npm by an active package in this same
-space (v0.17.1, tagged `mcp · x402 · payments · ai`). That project is a **payment
-rail**; this one is an **authority layer**. Complementary, but worth saying clearly.
+That is the same argument this library makes. Releasing it on a permanent
+bearer token pasted into a config would have been a poor look.
 
 ---
 

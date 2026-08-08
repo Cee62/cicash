@@ -74,9 +74,16 @@ private channel you have. Do not paste it into a shared transcript, a log, or an
 issue. That said — a leaked token alone cannot spend, because spending needs the
 key that came with it. Treat that as a second line of defence, not a licence.
 
+## Installing
+
+```bash
+pip install cicash          # Python
+npm install cicash          # JavaScript
+```
+
 ## Zero-install
 
-One file, no dependencies, no package manager:
+If you cannot install packages — one file, no dependencies, no package manager:
 
 ```bash
 curl -sL <cicash_single.py> -o cicash_single.py && python3 cicash_single.py
