@@ -1,0 +1,163 @@
+{
+  "canonical_caveats": [
+    "max_total:50000000",
+    "max_per_tx:5000000",
+    "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
+    "expires:1800000000.0",
+    "payees:[\"api.gpu\",\"api.search\"]",
+    "purpose:[\"research\"]"
+  ],
+  "canonical_request": "tok_child|api.search|2000000|research|run/1",
+  "child_lineage": [
+    "tok_root",
+    "tok_child"
+  ],
+  "child_scoped": [
+    [
+      "tok_root",
+      "cnf",
+      {
+        "alg": "ed25519",
+        "pub": "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
+      }
+    ],
+    [
+      "tok_root",
+      "max_total",
+      50000000
+    ],
+    [
+      "tok_root",
+      "max_per_tx",
+      5000000
+    ],
+    [
+      "tok_root",
+      "rate",
+      {
+        "max_amount": 20000000,
+        "max_count": 4,
+        "window_s": 60
+      }
+    ],
+    [
+      "tok_root",
+      "expires",
+      1800000000.0
+    ],
+    [
+      "tok_root",
+      "payees",
+      [
+        "api.gpu",
+        "api.search"
+      ]
+    ],
+    [
+      "tok_root",
+      "purpose",
+      [
+        "research"
+      ]
+    ],
+    [
+      "tok_child",
+      "cnf",
+      {
+        "alg": "ed25519",
+        "pub": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"
+      }
+    ],
+    [
+      "tok_child",
+      "max_total",
+      5000000
+    ]
+  ],
+  "digest_of_r1_body": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+  "inputs": {
+    "binding_child": {
+      "alg": "ed25519",
+      "pub": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"
+    },
+    "binding_root": {
+      "alg": "ed25519",
+      "pub": "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
+    },
+    "merchant_key_hex": "1111111111111111111111111111111111111111111111111111111111111111",
+    "root_key_hex": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "quote_payload": {
+    "amount": 2000000,
+    "expires_at": 1700000060.0,
+    "payee": "api.search",
+    "purpose": "research",
+    "quote_id": "q_demo"
+  },
+  "quote_sig_hmac_sha256": "d4c60e6b08dee34d4d02e5588332a40814125465b03359f98bdd7cc236d9906c",
+  "receipt_chain": [
+    {
+      "amount": 2000000,
+      "hash": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+      "idem_key": "run/1",
+      "lineage": [
+        "tok_root"
+      ],
+      "payee": "api.search",
+      "prev_hash": "genesis",
+      "purpose": "research",
+      "quote_id": "q_demo",
+      "receipt_id": "rcpt_1",
+      "root_id": "acme",
+      "ts": 1700000001.0
+    },
+    {
+      "amount": 1500000,
+      "hash": "b9961b5733f0a3a440345c4d2837623539dbd24e19e3475706bd89c8f7c1f347",
+      "idem_key": "run/2",
+      "lineage": [
+        "tok_root",
+        "tok_child"
+      ],
+      "payee": "api.gpu",
+      "prev_hash": "936527852ba47b4a3c2eb575dfc07056518575d6b9d53256cb0edcb98cbba734",
+      "purpose": "research",
+      "quote_id": "q_two",
+      "receipt_id": "rcpt_2",
+      "root_id": "acme",
+      "ts": 1700000002.0
+    }
+  ],
+  "token_child": {
+    "caveats": [
+      "cnf:{\"alg\":\"ed25519\",\"pub\":\"3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29\"}",
+      "max_total:50000000",
+      "max_per_tx:5000000",
+      "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
+      "expires:1800000000.0",
+      "payees:[\"api.gpu\",\"api.search\"]",
+      "purpose:[\"research\"]",
+      "sub:\"tok_child\"",
+      "cnf:{\"alg\":\"ed25519\",\"pub\":\"d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a\"}",
+      "max_total:5000000"
+    ],
+    "root_id": "acme",
+    "root_token_id": "tok_root",
+    "sig": "69233f188628ebb243649fe6e91d9b33aa1060dfc3f9241f095cc6335f554e36"
+  },
+  "token_root": {
+    "caveats": [
+      "cnf:{\"alg\":\"ed25519\",\"pub\":\"3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29\"}",
+      "max_total:50000000",
+      "max_per_tx:5000000",
+      "rate:{\"max_amount\":20000000,\"max_count\":4,\"window_s\":60}",
+      "expires:1800000000.0",
+      "payees:[\"api.gpu\",\"api.search\"]",
+      "purpose:[\"research\"]"
+    ],
+    "root_id": "acme",
+    "root_token_id": "tok_root",
+    "sig": "f809c8090de46e5a5ce3d4bd727d4df7d0acab4e504f3896d2e42cbb38bd934a"
+  },
+  "version": "0.2.0"
+}

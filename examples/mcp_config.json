@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "agentcash": {
+      "command": "python3",
+      "args": ["-m", "agentcash.mcp_server"],
+      "env": {
+        "AGENTCASH_DB": "/abs/path/ac.db",
+        "AGENTCASH_WALLET": "/abs/path/wallet.json",
+        "AGENTCASH_MERCHANTS": "api.search,api.gpu"
+      }
+    }
+  }
+}

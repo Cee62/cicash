@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentcash"
+version = "0.2.0"
+description = "A budget you lend to an AI agent, not money you give it: bounded, revocable, auditable spending authority."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+keywords = ["ai", "agent", "payments", "budget", "capability", "macaroon",
+            "mcp", "authorization", "http-402", "delegation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial",
+  "Topic :: Security :: Cryptography",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+ed25519 = ["cryptography>=42"]
+
+[project.scripts]
+agentcash = "agentcash.cli:main"
+agentcash-mcp = "agentcash.mcp_server:main"
+
+[project.urls]
+Specification = "https://github.com/agentcash/agentcash/blob/main/spec/SPEC.md"
+
+[tool.hatch.build.targets.sdist]
+include = ["agentcash", "tests", "spec", "tools", "examples", "README.md",
+           "LICENSE", "NOTICE", "CHANGELOG.md", "demo.py"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["agentcash"]
